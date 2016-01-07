@@ -32,4 +32,10 @@ public interface FormularioFacadeLocal {
     
     Formulario findByNue(int nue);
     
+    List<Formulario> findByNParte(int nParte);
+    
+    List<Formulario> findByRuc(String ruc);
+    
+    List<Formulario> findByRit(String rit);
+    
 }

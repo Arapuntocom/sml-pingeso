@@ -669,5 +669,55 @@ public class FormularioEJB implements FormularioEJBLocal {
         logger.exiting(this.getClass().getName(), "obtenerParticipantesCC", false);
         return false;
     }
+    
+     private boolean esNumero(String numero) {
+
+        try {
+            Integer.parseInt(numero);
+        } catch (NumberFormatException e) {
+            return false;
+        } catch (NullPointerException n) {
+            return false;
+        }
+        return true;
+    }
+
+    private List<Formulario> findByNParteRR(String input, String aBuscar) {
+
+        if (input.equals("") || aBuscar.equals("")) {
+            return null;
+        }
+        List<Formulario> formulario = new ArrayList();
+        if (aBuscar.equals("NumeroParte")) {
+
+            if (!esNumero(input)) {
+                return null;
+            }
+
+            formulario = formularioFacade.findByNParte(Integer.parseInt(input));
+            return formulario;
+
+        } else if (aBuscar.equals("Ruc")) {
+            
+            if(!checkRucOrRit(input)){
+                return null;
+            }
+            
+            formulario = formularioFacade.findByRuc(input);
+            
+            return formulario;
+
+        } else {
+            //es rit
+             if(!checkRucOrRit(input)){
+                return null;
+            }
+            
+            formulario = formularioFacade.findByRit(input);
+            
+            return formulario;
+
+        }
+    }
 
 }

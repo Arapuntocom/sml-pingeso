@@ -33,5 +33,7 @@ public interface UsuarioFacadeLocal {
     Usuario findByCuentaUsuario(String name);
 
     Usuario findByRUN(String run);
+    
+    Usuario findByEmail(String email);
 
 }
