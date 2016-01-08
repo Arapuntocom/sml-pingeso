@@ -5,7 +5,7 @@
  */
 package facade;
 
-import entity.Cargo;
+import entity.Semaforo;
 import java.util.List;
 import javax.ejb.Local;
 
@@ -14,22 +14,20 @@ import javax.ejb.Local;
  * @author sebastian
  */
 @Local
-public interface CargoFacadeLocal {
+public interface SemaforoFacadeLocal {
 
-    void create(Cargo cargo);
+    void create(Semaforo semaforo);
 
-    void edit(Cargo cargo);
+    void edit(Semaforo semaforo);
 
-    void remove(Cargo cargo);
+    void remove(Semaforo semaforo);
 
-    Cargo find(Object id);
+    Semaforo find(Object id);
 
-    List<Cargo> findAll();
+    List<Semaforo> findAll();
 
-    List<Cargo> findRange(int[] range);
+    List<Semaforo> findRange(int[] range);
 
     int count();
-    
-    Cargo findByCargo(String cargo);
     
 }

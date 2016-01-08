@@ -94,7 +94,6 @@ public class CrearFormularioChoferMB {
         this.cargo = uSesion.getCargoidCargo().getNombreCargo();
         this.levantadaPor = uSesion.getNombreUsuario();
         this.rut = uSesion.getRutUsuario();
-        this.unidad = uSesion.getUnidad(); 
         
         GregorianCalendar c = new GregorianCalendar();
         this.fecha = c.getTime();        

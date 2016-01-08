@@ -90,7 +90,6 @@ public class CrearFormularioPeritoMB {
 
         this.cargo = this.uSesion.getCargoidCargo().getNombreCargo();
         this.levantadaPor = this.uSesion.getNombreUsuario();
-        this.unidad = this.uSesion.getUnidad();
         this.rut = this.uSesion.getRutUsuario();
 
         GregorianCalendar c = new GregorianCalendar();

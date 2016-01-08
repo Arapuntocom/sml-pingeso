@@ -24,7 +24,7 @@ public interface FormularioEJBLocal {
 
     public List<Traslado> traslados(Formulario formulario);
 
-    public String crearTraslado(Formulario formulario, String usuarioEntrega, String usuarioEntregaUnidad, String usuarioEntregaCargo, String usuarioEntregaRut, String usuarioRecibe, String usuarioRecibeUnidad, String usuarioRecibeCargo, String usuarioRecibeRut, Date fechaT, String observaciones, String motivo, Usuario usuarioSesion);
+    public String crearTraslado(Formulario formulario, String usuarioEntrega, String usuarioEntregaCargo, String usuarioEntregaRut, String usuarioRecibe, String usuarioRecibeCargo, String usuarioRecibeRut, Date fechaT, String observaciones, String motivo, Usuario usuarioSesion);
     
     public String edicionFormulario(Formulario formulario, String obsEdicion, Usuario usuarioSesion);
     

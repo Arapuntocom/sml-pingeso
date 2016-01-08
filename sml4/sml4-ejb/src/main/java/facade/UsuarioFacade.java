@@ -6,7 +6,6 @@
 package facade;
 
 import entity.Usuario;
-import static facade.AbstractFacade.logger;
 import java.util.logging.Level;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -22,11 +21,10 @@ import javax.persistence.TransactionRequiredException;
 
 /**
  *
- * @author Aracelly
+ * @author sebastian
  */
 @Stateless
 public class UsuarioFacade extends AbstractFacade<Usuario> implements UsuarioFacadeLocal {
-
     @PersistenceContext(unitName = "com.pingeso_sml4-ejb_ejb_3.0-SNAPSHOTPU")
     private EntityManager em;
 
@@ -38,8 +36,8 @@ public class UsuarioFacade extends AbstractFacade<Usuario> implements UsuarioFac
     public UsuarioFacade() {
         super(Usuario.class);
     }
-
-    //@NamedQuery(name = "Usuario.findByCuentaUsuario", query = "SELECT u FROM Usuario u WHERE u.cuentaUsuario = :cuentaUsuario")s
+    
+     //@NamedQuery(name = "Usuario.findByCuentaUsuario", query = "SELECT u FROM Usuario u WHERE u.cuentaUsuario = :cuentaUsuario")s
     @Override
     public Usuario findByCuentaUsuario(String name) {
         logger.setLevel(Level.ALL);
@@ -178,5 +176,5 @@ public class UsuarioFacade extends AbstractFacade<Usuario> implements UsuarioFac
             return retorno;
         }
     }
-
+    
 }

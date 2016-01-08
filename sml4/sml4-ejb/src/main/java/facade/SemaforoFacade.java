@@ -5,7 +5,9 @@
  */
 package facade;
 
-import entity.FormularioEvidencia;
+import facade.SemaforoFacadeLocal;
+import entity.Semaforo;
+import facade.AbstractFacade;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -15,7 +17,7 @@ import javax.persistence.PersistenceContext;
  * @author sebastian
  */
 @Stateless
-public class FormularioEvidenciaFacade extends AbstractFacade<FormularioEvidencia> implements FormularioEvidenciaFacadeLocal {
+public class SemaforoFacade extends AbstractFacade<Semaforo> implements SemaforoFacadeLocal {
     @PersistenceContext(unitName = "com.pingeso_sml4-ejb_ejb_3.0-SNAPSHOTPU")
     private EntityManager em;
 
@@ -24,8 +26,8 @@ public class FormularioEvidenciaFacade extends AbstractFacade<FormularioEvidenci
         return em;
     }
 
-    public FormularioEvidenciaFacade() {
-        super(FormularioEvidencia.class);
+    public SemaforoFacade() {
+        super(Semaforo.class);
     }
     
 }

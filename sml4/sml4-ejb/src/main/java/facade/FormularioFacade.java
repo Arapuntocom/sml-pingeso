@@ -4,10 +4,8 @@
  * and open the template in the editor.
  */
 package facade;
- 
+
 import entity.Formulario;
-import entity.Usuario;
-import static facade.AbstractFacade.logger;
 import java.util.List;
 import java.util.logging.Level;
 import javax.ejb.Stateless;
@@ -21,24 +19,24 @@ import javax.persistence.PessimisticLockException;
 import javax.persistence.Query;
 import javax.persistence.QueryTimeoutException;
 import javax.persistence.TransactionRequiredException;
- 
+
 /**
  *
- * @author Aracelly
+ * @author sebastian
  */
 @Stateless
 public class FormularioFacade extends AbstractFacade<Formulario> implements FormularioFacadeLocal {
     @PersistenceContext(unitName = "com.pingeso_sml4-ejb_ejb_3.0-SNAPSHOTPU")
     private EntityManager em;
- 
+
     @Override
     protected EntityManager getEntityManager() {
         return em;
     }
- 
+
     public FormularioFacade() {
         super(Formulario.class);
-    }   
+    }
     
     //@NamedQuery(name = "Formulario.findByNue", query = "SELECT f FROM Formulario f WHERE f.nue = :nue")
     @Override
@@ -225,4 +223,5 @@ public class FormularioFacade extends AbstractFacade<Formulario> implements Form
             return retorno;
         }
     }
+    
 }
