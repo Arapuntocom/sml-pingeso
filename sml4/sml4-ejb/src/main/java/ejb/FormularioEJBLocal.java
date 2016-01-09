@@ -30,8 +30,12 @@ public interface FormularioEJBLocal {
     
   //  public List<EdicionFormulario> listaEdiciones(int nue, int idUsuario);
     
-    public String crearFormulario(String ruc, String rit, int nue, int nParte, String cargo, String delito, String direccionSS, String lugar, String unidad, String levantadoPor, String rut, Date fecha, String observacion, String descripcion, Usuario digitador);
+    //public String crearFormulario(String ruc, String rit, int nue, int nParte, String cargo, String delito, String direccionSS, String lugar, String unidad, String levantadoPor, String rut, Date fecha, String observacion, String descripcion, Usuario digitador);
 
+    public String crearFormulario(String areaEvidencia,String evidencia, String motivo, String ruc,
+            String rit, int nue, int nParte, String cargo, String delito, String direccionSS, String lugar,
+            String unidad, String levantadoPor, String rut, Date fecha, String observacion, String descripcion, Usuario digitador);
+    
     public Usuario obtenerPoseedorFormulario(Formulario formulario);
     
     public List<EdicionFormulario> listaEdiciones(int nue);
@@ -39,5 +43,7 @@ public interface FormularioEJBLocal {
     public boolean esParticipanteCC(Formulario formulario, Usuario usuario);
     
     public String edicionFormulario(Formulario formulario, String obsEdicion, Usuario usuarioSesion, int parte, String ruc, String rit);
+    
+    public List<Formulario> findByNParteRR(String input, String aBuscar);
 }
 

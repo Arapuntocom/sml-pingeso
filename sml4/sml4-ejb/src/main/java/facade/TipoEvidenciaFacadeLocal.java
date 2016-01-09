@@ -5,6 +5,7 @@
  */
 package facade;
 
+import entity.Area;
 import entity.TipoEvidencia;
 import entity.TipoMotivo;
 import java.util.List;
@@ -31,6 +32,10 @@ public interface TipoEvidenciaFacadeLocal {
 
     int count();
     
-    TipoMotivo findByTipoMotivo(String motivo);
+    TipoEvidencia findByNombreTipoEvidencia(String nombreTipoEvidencia);
+    
+    TipoEvidencia findByNombreAndTipoEvidencia(String nombreTipoEvidencia, Area areaEvidencia);
+    
+    //TipoMotivo findByTipoMotivo(String motivo);
     
 }

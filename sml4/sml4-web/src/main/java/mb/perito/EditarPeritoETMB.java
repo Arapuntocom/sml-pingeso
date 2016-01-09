@@ -7,7 +7,9 @@ package mb.perito;
 
 import ejb.FormularioEJBLocal;
 import ejb.UsuarioEJBLocal;
+import ejb.ValidacionVistasMensajesEJBLocal;
 import entity.EdicionFormulario;
+import entity.Evidencia;
 import entity.Formulario;
 import entity.Traslado;
 import entity.Usuario;
@@ -34,6 +36,9 @@ import javax.servlet.http.HttpServletRequest;
 public class EditarPeritoETMB {
 
     @EJB
+    private ValidacionVistasMensajesEJBLocal validacionVistasMensajesEJB;
+
+    @EJB
     private UsuarioEJBLocal usuarioEJB;
 
     @EJB
@@ -53,11 +58,13 @@ public class EditarPeritoETMB {
 
     private String observacionEdicion;
 
-    //Listado de  ediciones realizadas
-    List<EdicionFormulario> ediciones;
-    List<Traslado> traslados;
+    //Listado de  edicionesList realizadas
+    private List<EdicionFormulario> edicionesList;
+    private List<Traslado> trasladosList;
     
-    //para habilitar la edicion de estos campos.
+    private List<Evidencia> evidenciasList;
+    
+    //para deshabilitar la edicion de estos campos.
     private boolean isRit;
     private boolean isRuc;
     private boolean isParte;
@@ -74,8 +81,9 @@ public class EditarPeritoETMB {
         logger.setLevel(Level.ALL);
         logger.entering(this.getClass().getName(), "EditarPeritoETMB");
         /**/
-        this.ediciones = new ArrayList();
-        this.traslados = new ArrayList();
+        this.edicionesList = new ArrayList();
+        this.trasladosList = new ArrayList();
+        this.evidenciasList = new ArrayList<>();
         this.facesContext1 = FacesContext.getCurrentInstance();
         this.httpServletRequest1 = (HttpServletRequest) facesContext1.getExternalContext().getRequest();
 
@@ -93,7 +101,6 @@ public class EditarPeritoETMB {
         }
         
         
-
         this.isRit = true;
         this.isRuc = true;
         this.isParte = true;
@@ -107,8 +114,9 @@ public class EditarPeritoETMB {
         logger.entering(this.getClass().getName(), "cargarDatosPerito");
         this.formulario = formularioEJB.findFormularioByNue(this.nue);
         this.usuarioSesion = usuarioEJB.findUsuarioSesionByCuenta(usuarioS);
-        this.traslados = formularioEJB.traslados(formulario);
-        this.ediciones = formularioEJB.listaEdiciones(this.nue);
+        this.trasladosList = formularioEJB.traslados(formulario);
+        this.edicionesList = formularioEJB.listaEdiciones(this.nue);
+        this.evidenciasList = this.formulario.getEvidenciaList();
         
         if (formulario.getNumeroParte() == 0) {
             this.isParte = false;
@@ -119,28 +127,53 @@ public class EditarPeritoETMB {
         if (formulario.getRit() == null || formulario.getRit().equals("")) {
             this.isRit = false;
         }
-
         logger.exiting(this.getClass().getName(), "cargarDatosPerito");
     }
 
     public String editarFormulario() {
         logger.setLevel(Level.ALL);
         logger.entering(this.getClass().getName(), "editarFormularioPerito");
-        if (formulario.getNumeroParte() > 0 && this.isParte == false) {
+        boolean datosIncorrectos = false;
+        if (this.isParte == false && formulario.getNumeroParte() != 0) {
             parte = formulario.getNumeroParte();
             logger.log(Level.INFO, "MB parte -> {0}", parte);
-            isParte = true;
+            String mensaje = validacionVistasMensajesEJB.checkParte(formulario.getNumeroParte());
+            if(mensaje.equals("Exito"))
+                isParte = true;
+            else{                
+                FacesContext.getCurrentInstance().addMessage("ruc", new FacesMessage(FacesMessage.SEVERITY_WARN, mensaje," "));
+                datosIncorrectos = true;
+            }            
         }
-        if (formulario.getRuc() != null && !formulario.getRuc().equals("") && this.isRuc == false) {
+        if (this.isRuc == false && formulario.getRuc() != null && !formulario.getRuc().equals("")) {
             ruc = formulario.getRuc();
-            logger.log(Level.INFO, "MB ruc -> {0}", ruc);
-            isRuc = true;
+            logger.log(Level.INFO, "MB ruc -> {0}", ruc);   
+            String mensaje = validacionVistasMensajesEJB.checkRuc(formulario.getRuc());
+            if(mensaje.equals("Exito"))
+                isRuc = true;
+            else{                
+                FacesContext.getCurrentInstance().addMessage("ruc", new FacesMessage(FacesMessage.SEVERITY_WARN, mensaje," "));
+                datosIncorrectos = true;
+            }
         }
-        if (formulario.getRit() != null && !formulario.getRit().equals("") && this.isRit == false) {
+        if (this.isRit == false && formulario.getRit() != null && !formulario.getRit().equals("")) {
             rit = formulario.getRit();
             logger.log(Level.INFO, "MB rit -> {0}", rit);
-            isRit = true;
+            String mensaje = validacionVistasMensajesEJB.checkRit(formulario.getRit());
+            if(mensaje.equals("Exito"))
+                isRit = true;
+            else{                
+                FacesContext.getCurrentInstance().addMessage("ruc", new FacesMessage(FacesMessage.SEVERITY_WARN, mensaje," "));
+                datosIncorrectos = true;
+            }
         }
+        
+        if(datosIncorrectos){
+            httpServletRequest.getSession().setAttribute("nueF", this.nue);
+            httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.usuarioS);
+            logger.exiting(this.getClass().getName(), "editarFormularioPerito", "");
+            return "";
+        }        
 
         String response = formularioEJB.edicionFormulario(formulario, observacionEdicion, usuarioSesion, parte, ruc, rit);
         httpServletRequest.getSession().setAttribute("nueF", this.nue);
@@ -149,6 +182,7 @@ public class EditarPeritoETMB {
             logger.exiting(this.getClass().getName(), "editarFormularioPerito", "todoPerito");
             return "todoPerito.xhtml?faces-redirect=true";
         }
+        
         //FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ocurrió un problema al guardar los cambios, por favor intente más tarde.", "error al editar"));
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, response, "error al editar"));
         logger.exiting(this.getClass().getName(), "editarFormularioPerito", "");
@@ -162,6 +196,22 @@ public class EditarPeritoETMB {
         httpServletRequest1.removeAttribute("cuentaUsuario");
         logger.exiting(this.getClass().getName(), "salirPerito", "/indexListo");
         return "/indexListo.xhtml?faces-redirect=true";
+    }
+    
+    public void validarRuc(){
+        System.out.println("entra a validador del ruc en la vista, valida -> "+formulario.getRuc());
+        String mensaje = validacionVistasMensajesEJB.checkRuc(formulario.getRuc());
+        if(!mensaje.equals("exito")){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, mensaje," "));
+        }
+    }
+
+    public List<Evidencia> getEvidenciasList() {
+        return evidenciasList;
+    }
+
+    public void setEvidenciasList(List<Evidencia> evidenciasList) {
+        this.evidenciasList = evidenciasList;
     }
 
     public int getNue() {
@@ -196,20 +246,20 @@ public class EditarPeritoETMB {
         this.observacionEdicion = observacionEdicion;
     }
 
-    public List<EdicionFormulario> getEdiciones() {
-        return ediciones;
+    public List<EdicionFormulario> getEdicionesList() {
+        return edicionesList;
     }
 
-    public void setEdiciones(List<EdicionFormulario> ediciones) {
-        this.ediciones = ediciones;
+    public void setEdicionesList(List<EdicionFormulario> edicionesList) {
+        this.edicionesList = edicionesList;
     }
 
-    public List<Traslado> getTraslados() {
-        return traslados;
+    public List<Traslado> getTrasladosList() {
+        return trasladosList;
     }
 
-    public void setTraslados(List<Traslado> traslados) {
-        this.traslados = traslados;
+    public void setTrasladosList(List<Traslado> trasladosList) {
+        this.trasladosList = trasladosList;
     }
 
     public boolean isIsRit() {

@@ -29,5 +29,7 @@ public interface SemaforoFacadeLocal {
     List<Semaforo> findRange(int[] range);
 
     int count();
+
+    public Semaforo findByColor(String amarillo);
     
 }

@@ -30,7 +30,7 @@
 
             <h:form>
                 <div class="thumbnail">
-                    <div align="center"><h:outputLabel class="input-group-lg" style=" background-color: white" value="Bienvenido(a) #{crearFormularioPeritoMB.getuSesion().nombreUsuario}"></h:outputLabel></div>
+                    <div align="center"><h:outputLabel class="input-group-lg" style=" background-color: white" value="Bienvenido(a) #{crearFormularioPeritoMB.usuarioSesion.nombreUsuario}"></h:outputLabel></div>
                 </div>
             </h:form> 
 
@@ -46,7 +46,7 @@
                         <ul class="nav nav-tabs nav-justified">
 
                             <li role="presentation" class="active" ><a href="peritoFormulario.xhtml">Iniciar Cadena de Custodia</a></li> 
-                            <li role="presentation" class="active" ><a href="buscadorPerito.xhtml">Buscar Cadena de Custodia</a></li>   
+                            <li role="presentation"><a href="buscadorPerito.xhtml">Buscar Cadena de Custodia</a></li>   
                             <li role="presentation"> <h:commandLink id="cs" action="#{crearFormularioPeritoMB.salir()}" value="Cerrar sesión"></h:commandLink> </li>
 
                         </ul>
@@ -68,7 +68,7 @@
                         </p><hr />
 
                         <p class="lead">
-                            <a href="https://www.facebook.com/smlchile" target="_blank"><img class="img-responsive" src=".../imagenes/fb_logo1.png" alt=" "/></a>
+                            <a href="http://www.sml.cl/intranetsml/index.php" target="_blank"><img class="img-responsive" src=".../imagenes/intranet.jpg" alt=" "/></a>
                         </p><hr />                       
                     </div>
 
@@ -127,8 +127,8 @@
                                         <p:message for="lu" display="text"/> 
                                         <br />
 
-                                        <h:outputLabel  for="uni" value="Unidad:" style="width:120px"></h:outputLabel>
-                                        <p:inputText id="uni" value="#{crearFormularioPeritoMB.unidad}" label="Unidad" disabled="true"></p:inputText>
+                                        <h:outputLabel  for="uni" value="Unidad Policial:" style="width:120px"></h:outputLabel>
+                                        <p:inputText id="uni" value="#{crearFormularioPeritoMB.unidadPolicial}" label="Unidad" required="true" requiredMessage="Debe ingresar la unidad policial"></p:inputText>
                                         <p:message for="uni" display="text"/> 
                                         <br />
 
@@ -155,11 +155,101 @@
                                         <h:outputLabel  for="Observaciones" value="Observaciones:" style="width:120px"></h:outputLabel>
                                         <p:inputTextarea id="Observaciones" rows="3" cols="90" value="#{crearFormularioPeritoMB.observacion}" queryDelay="750" minQueryLength="4" />
 
-                                        <h:outputLabel  for="descripcion" value="Descripción:" style="width:120px"></h:outputLabel>
-                                        <p:inputTextarea id="descripcion" rows="3" cols="90" value="#{crearFormularioPeritoMB.descripcion}" queryDelay="750" minQueryLength="4" />
-                                    </h:panelGrid>                                
+                                    </h:panelGrid>  
+                                    <br />  
 
-                                    <h:commandButton id="btnAceptar" value="Aceptar" action="#{crearFormularioPeritoMB.iniciarFormulario()}" />
+                                    <!-- evidencia -->
+                                    <h:panelGrid columns="3">
+
+                                        <h:outputLabel for="tipoEvidencia" value="Tipo de evidencia: " />
+                                        <h:selectOneMenu id="tipoEvidencia" value="#{crearFormularioPeritoMB.codTipoEvidencia}">
+                                            <f:selectItem itemValue="0" itemLabel="Seleccione" noSelectionOption="true"/>
+                                            <f:selectItem itemValue="1" itemLabel="Biológica (Clínica)"/>
+                                            <f:selectItem itemValue="2" itemLabel="Vestuario (Clínica)"/>
+                                            <f:selectItem itemValue="3" itemLabel="Artefacto (Clínica)"/>
+                                            <f:selectItem itemValue="4" itemLabel="otro (Clínica)"/>
+                                            <f:selectItem itemValue="5" itemLabel="Balística (Tanatología)"/>
+                                            <f:selectItem itemValue="6" itemLabel="Biológica (Tanatología)"/>
+                                            <f:selectItem itemValue="7" itemLabel="Vestuario (Tanatología)"/>
+                                            <f:selectItem itemValue="8" itemLabel="Artefacto (Tanatología)"/>
+                                            <f:selectItem itemValue="9" itemLabel="otro (Tanatología)"/>
+                                            <p:ajax event="change" listener="#{crearFormularioPeritoMB.cargarEvidencias(event)}" update="evidencias"/>
+                                        </h:selectOneMenu>
+                                        <br />
+
+                                        <h:outputLabel for="evidencias" value="Evidencias:" />
+                                        
+                                        <h:selectOneMenu id="evidencias" value="#{crearFormularioPeritoMB.evidencias}">    
+                                            <f:selectItem itemValue="0" itemLabel="Seleccione" noSelectionOption="true"/>
+                                            <f:selectItems value="#{crearFormularioPeritoMB.listEvidenciasx}" var="evid" itemLabel="#{evid}" itemValue="#{evid}"/>                                           
+                                        </h:selectOneMenu>
+
+                                        <br />
+                                    </h:panelGrid>
+                                    
+                                    <!-- evidencia -->
+
+
+
+                                    <h:panelGrid columns="1" cellpadding="5" class="ui-grid">    
+
+                                        <h:outputLabel  for="descripcion" value="Descripción de la especie:" ></h:outputLabel>
+                                        <p:inputTextarea id="descripcion" rows="3" cols="90" value="#{crearFormularioPeritoMB.descripcion}" queryDelay="750" minQueryLength="4" />
+                                    </h:panelGrid>                                                           
+
+
+                                    <!-- cosas nuevas-->
+                                    <br />
+                                    <h4 class="pull-center">Entrega:</h4> <br />
+
+                                    <h:panelGrid columns="5" cellpadding="5" class="ui-grid">
+
+                                        <h:outputLabel  style="width:120px" for="UnE" value="Área:"></h:outputLabel> <!-- nose si poner la misma etiqueta -->
+                                        <p:inputText id="UnE" value="#{crearFormularioPeritoMB.usuarioSesion.areaidArea.nombreArea}" label="Área" disabled="true">
+                                        </p:inputText>
+                                        <p:message for="UnE" display="text"/> 
+
+                                    </h:panelGrid>
+                                    <h:panelGrid columns="5" cellpadding="5" class="ui-grid">
+
+                                        <h:outputLabel  style="width:120px" for="CE" value="Cargo:"></h:outputLabel> <!-- nose si poner la misma etiqueta -->
+                                        <p:inputText id="CE" value="#{crearFormularioPeritoMB.usuarioSesion.cargoidCargo.nombreCargo}" label="Cargo" required="true" disabled="true">
+                                        </p:inputText>
+                                        <p:message for="CE" display="text"/> 
+
+                                    </h:panelGrid>
+
+                                    <h:panelGrid columns="5" cellpadding="5" class="ui-grid">
+
+                                        <h:outputLabel  style="width:120px" for="nomE" value="Nombre:"></h:outputLabel>
+                                        <p:inputText id="nomE" value="#{crearFormularioPeritoMB.usuarioSesion.nombreUsuario}" label="Nombre" disabled="true">
+                                        </p:inputText>
+                                        <p:message for="nomE" display="text"/> 
+
+                                    </h:panelGrid>
+
+                                    <h:panelGrid columns="5" cellpadding="5" class="ui-grid">
+
+                                        <h:outputLabel  style="width:120px" for="runE" value="R.U.N.:"></h:outputLabel>
+                                        <p:inputText id="runE" value="#{crearFormularioPeritoMB.usuarioSesion.rutUsuario}" label="R.U.N." disabled="true">
+                                        </p:inputText>
+                                        <p:message for="runE" display="text"/> 
+
+                                    </h:panelGrid>
+                                    <br />
+                                    <div align="center">
+                                        <h:selectOneRadio id="check" value="#{crearFormularioPeritoMB.motivo}" required="true" requiredMessage="Ingrese que acción realizará con la evidencia">
+                                            <f:selectItem itemValue="Peritaje" itemLabel="Peritaje" /> <!-- agregar libreria arriba-->
+                                            <f:selectItem itemValue="Traslado" itemLabel="Traslado" />
+                                            <f:selectItem itemValue="Custodia" itemLabel="Custodia" />
+                                        </h:selectOneRadio><br />
+                                        <p:message for="check" display="text"/>
+                                    </div><br />
+
+                                    <!-- fin cosas nuevas-->
+
+
+                                    <h:commandButton id="btnAceptar" value="Aceptar" action="#{crearFormularioPeritoMB.iniciarFormulario()}"  />
                                     <p:messages id="messages" closable="true" />
                                 </h:form> <br />
                             </div>

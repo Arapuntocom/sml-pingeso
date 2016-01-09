@@ -7,9 +7,8 @@ package ejb;
 
 import entity.Area;
 import entity.Cargo;
-import entity.TipoUsuario;
 import entity.Usuario;
-import facade.TipoUsuarioFacade;
+import facade.TipoUsuarioFacadeLocal;
 import facade.UsuarioFacadeLocal;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,9 +25,13 @@ import javax.ejb.Stateless;
 public class UsuarioEJB implements UsuarioEJBLocal {
 
     @EJB
-    private UsuarioFacadeLocal usuarioFacade;
+    private TipoUsuarioFacadeLocal tipoUsuarioFacade;
+
+
     @EJB
-    private TipoUsuarioFacade tipoUsuarioFacade;
+    private UsuarioFacadeLocal usuarioFacade;
+  
+    
     @EJB
     private ValidacionEJBLocal valdicionEJB;
 
@@ -111,13 +114,13 @@ public class UsuarioEJB implements UsuarioEJBLocal {
         nuevoUsuario.setCargoidCargo(cargo);
         nuevoUsuario.setAreaidArea(area);
         
-        TipoUsuario tu = new TipoUsuario();
-        tu = tipoUsuarioFacade.findByTipo("sml");
+        /*}TipoUsuario tu = new TipoUsuario();
+        /tu = tipoUsuarioFacade.findByTipo("SML");
         if(tu == null){
             return "Tipo de usuario no existe";
         }
         nuevoUsuario.setTipoUsuarioidTipoUsuario(tu);
-       
+       */
 
         return "Exito";
     }

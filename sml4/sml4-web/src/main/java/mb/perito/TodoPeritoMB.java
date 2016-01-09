@@ -8,6 +8,7 @@ package mb.perito;
 import ejb.FormularioEJBLocal;
 import ejb.UsuarioEJBLocal;
 import entity.EdicionFormulario;
+import entity.Evidencia;
 import entity.Formulario;
 import entity.Traslado;
 import entity.Usuario;
@@ -54,6 +55,8 @@ public class TodoPeritoMB {
     private List<Traslado> trasladosList;
     private List<EdicionFormulario> edicionesList;
     
+    private List<Evidencia> evidenciasList;
+    
     private boolean bloqueada;
     private boolean editable;
 
@@ -64,6 +67,7 @@ public class TodoPeritoMB {
         logger.entering(this.getClass().getName(), "TodoPeritoMB");
         this.trasladosList = new ArrayList<>();
         this.edicionesList = new ArrayList<>();
+        this.evidenciasList = new ArrayList<>();
         facesContext = FacesContext.getCurrentInstance();
         httpServletRequest = (HttpServletRequest) facesContext.getExternalContext().getRequest();
         if (httpServletRequest.getSession().getAttribute("nueF") != null) {
@@ -87,7 +91,12 @@ public class TodoPeritoMB {
         this.usuarioSesion = usuarioEJB.findUsuarioSesionByCuenta(usuarioSis);
         
         this.trasladosList = formularioEJB.traslados(this.formulario);
+//        if(!trasladosList.isEmpty()){
+//            this.trasladosList.remove(trasladosList.size()-1);
+//        }
         this.edicionesList = formularioEJB.listaEdiciones(nue);
+        
+        this.evidenciasList = this.formulario.getEvidenciaList();
         
         this.bloqueada = formulario.getBloqueado();
         this.editable = formularioEJB.esParticipanteCC(formulario, usuarioSesion);
@@ -131,13 +140,21 @@ public class TodoPeritoMB {
     }
     
     //envía a la página para recibir la cadena
-    public String recibirCadena(){
+    public String recibirCadena(){ 
         logger.setLevel(Level.ALL);
         logger.entering(this.getClass().getName(), "recibirCadena");
         httpServletRequest.getSession().setAttribute("nueF", this.nue);
         httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.usuarioSis);       
         logger.exiting(this.getClass().getName(), "recibirCadena", "recibirPeritoET");
         return "recibirPeritoET?faces-redirect=true";
+    }
+
+    public List<Evidencia> getEvidenciasList() {
+        return evidenciasList;
+    }
+
+    public void setEvidenciasList(List<Evidencia> evidenciasList) {
+        this.evidenciasList = evidenciasList;
     }
 
     public List<EdicionFormulario> getEdicionesList() {

@@ -10,6 +10,7 @@ import ejb.UsuarioEJBLocal;
 import entity.Usuario;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -56,6 +57,13 @@ public class CrearFormularioChoferMB {
     private String descripcion;
     private int parte;
 
+    private String motivo;
+    
+    private String evidencias; //para capturar el nombre de la evidencia seleccionada
+    private String codTipoEvidencia;
+    private String depa;
+    private List<String> listEvidencias;
+    
     //Guardamos la cuenta del usuario que entrego la vista del login
     private String usuarioSis;
 
@@ -108,7 +116,7 @@ public class CrearFormularioChoferMB {
         logger.log(Level.FINEST, "usuario inicia rut {0}", this.rut);
         logger.log(Level.FINEST, "formulario fecha {0}", this.fecha);
         logger.log(Level.FINEST, "usuario inicia cargo {0}", this.cargo);
-        String resultado = formularioEJB.crearFormulario(ruc, rit, nue, parte, cargo, delito, direccionSS, lugar, unidad, levantadaPor, rut, fecha, observacion, descripcion, uSesion);
+        String resultado = formularioEJB.crearFormulario(codTipoEvidencia, evidencias, motivo, ruc, rit, nue, parte, cargo, delito, direccionSS, lugar, unidad, levantadaPor, rut, fecha, observacion, descripcion, uSesion);
        
         if (resultado.equals("Exito")) {            
             //Enviando nue
@@ -132,6 +140,14 @@ public class CrearFormularioChoferMB {
         httpServletRequest1.removeAttribute("cuentaUsuario");
         logger.exiting(this.getClass().getName(), "salirChofer", "/indexListo");
         return "/indexListo?faces-redirect=true";
+    }
+
+    public String getMotivo() {
+        return motivo;
+    }
+
+    public void setMotivo(String motivo) {
+        this.motivo = motivo;
     }
 
     public Usuario getuSesion() {

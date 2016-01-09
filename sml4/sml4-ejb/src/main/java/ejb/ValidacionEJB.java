@@ -5,13 +5,10 @@
  */
 package ejb;
 
-import entity.Formulario;
 import entity.Usuario;
 import facade.FormularioFacadeLocal;
 import facade.UsuarioFacadeLocal;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -27,12 +24,12 @@ import javax.ejb.Stateless;
 public class ValidacionEJB implements ValidacionEJBLocal {
 
     @EJB
-    FormularioFacadeLocal formularioFacade;
+    private FormularioFacadeLocal formularioFacade;
 
     @EJB
-    UsuarioFacadeLocal usuarioFacade;
+    private UsuarioFacadeLocal usuarioFacade;     
 
-    static final Logger logger = Logger.getLogger(FormularioEJB.class.getName());
+    static final Logger logger = Logger.getLogger(ValidacionEJB.class.getName());
 
     @Override
     public boolean compareFechas(Date fechaT, Date fechaFormulario) {
@@ -158,46 +155,7 @@ public class ValidacionEJB implements ValidacionEJBLocal {
             return false;
         }
         return true;
-    }
-
-    @Override
-    public List<Formulario> findByNParteRR(String input, String aBuscar) {
-
-        if (input.equals("") || aBuscar.equals("")) {
-            return null;
-        }
-        List<Formulario> formulario = new ArrayList();
-        if (aBuscar.equals("NumeroParte")) {
-
-            if (!esNumero(input)) {
-                return null;
-            }
-
-            formulario = formularioFacade.findByNParte(Integer.parseInt(input));
-            return formulario;
-
-        } else if (aBuscar.equals("Ruc")) {
-
-            if (!checkRucOrRit(input)) {
-                return null;
-            }
-
-            formulario = formularioFacade.findByRuc(input);
-
-            return formulario;
-
-        } else {
-            //es rit
-            if (!checkRucOrRit(input)) {
-                return null;
-            }
-
-            formulario = formularioFacade.findByRit(input);
-
-            return formulario;
-
-        }
-    }
+    }   
 
     //Funcion para validar el email
     //Retorna true en el caso que sea valido
@@ -233,9 +191,9 @@ public class ValidacionEJB implements ValidacionEJBLocal {
                     direccion = "/chofer/choferFormulario.xhtml?faces-redirect=true";
                 } else if (foundUser.getCargoidCargo().getNombreCargo().equals("Digitador")) {
                     direccion = "/digitador/digitadorFormularioHU11.xhtml?faces-redirect=true";
-                } else if (foundUser.getCargoidCargo().getNombreCargo().equals("Tecnico")) {
+                } else if (foundUser.getCargoidCargo().getNombreCargo().equals("Técnico")) {
                     direccion = "/tecnico/buscadorTecnico.xhtml?faces-redirect=true";
-                } else if (foundUser.getCargoidCargo().getNombreCargo().equals("Jefe de area")) {
+                } else if (foundUser.getCargoidCargo().getNombreCargo().equals("Jefe de área")) {
                     direccion = "/jefeArea/buscadorJefeArea.xhtml?faces-redirect=true";
                 }
             }

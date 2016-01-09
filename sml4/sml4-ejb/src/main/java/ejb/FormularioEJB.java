@@ -3,7 +3,10 @@ package ejb;
 import entity.Area;
 import entity.Cargo;
 import entity.EdicionFormulario;
+import entity.Evidencia;
 import entity.Formulario;
+import entity.Semaforo;
+import entity.TipoEvidencia;
 import entity.TipoMotivo;
 import entity.TipoUsuario;
 import entity.Traslado;
@@ -11,7 +14,10 @@ import entity.Usuario;
 import facade.AreaFacadeLocal;
 import facade.CargoFacadeLocal;
 import facade.EdicionFormularioFacadeLocal;
+import facade.EvidenciaFacadeLocal;
 import facade.FormularioFacadeLocal;
+import facade.SemaforoFacadeLocal;
+import facade.TipoEvidenciaFacadeLocal;
 import facade.TipoMotivoFacadeLocal;
 import facade.TipoUsuarioFacadeLocal;
 import facade.TrasladoFacadeLocal;
@@ -21,8 +27,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
@@ -33,6 +37,13 @@ import javax.ejb.Stateless;
 @Stateless
 public class FormularioEJB implements FormularioEJBLocal {
 
+    @EJB
+    private TipoEvidenciaFacadeLocal tipoEvidenciaFacade;
+
+    @EJB
+    private EvidenciaFacadeLocal evidenciaFacade;
+    @EJB
+    private SemaforoFacadeLocal semaforoFacade;
     @EJB
     private CargoFacadeLocal cargoFacade;
     @EJB
@@ -50,7 +61,7 @@ public class FormularioEJB implements FormularioEJBLocal {
     @EJB
     private EdicionFormularioFacadeLocal edicionFormularioFacade;
     @EJB
-    private ValidacionEJB validacionEJB;
+    private ValidacionEJBLocal validacionEJB;
 
     static final Logger logger = Logger.getLogger(FormularioEJB.class.getName());
 
@@ -220,22 +231,19 @@ public class FormularioEJB implements FormularioEJBLocal {
             return "El usuario que recibe la cadena de custodia debe ser distinto al usuario que la entrega.";
         }
 
-        //Creando traslado
-        Traslado nuevoTraslado = new Traslado();
-        nuevoTraslado.setFechaEntrega(fechaT);
-        nuevoTraslado.setFormularioNUE(formulario);
-        nuevoTraslado.setObservaciones(observaciones);
-        nuevoTraslado.setTipoMotivoidMotivo(motivoP);
-        nuevoTraslado.setUsuarioidUsuarioRecibe(usuarioRecibeP);
-        nuevoTraslado.setUsuarioidUsuarioEntrega(usuarioEntregaP);
+        //Actualizando traslado
+        Traslado ultimoTraslado = ultimoTraslado(formulario.getNue());
+        ultimoTraslado.setFechaEntrega(fechaT);
+        ultimoTraslado.setObservaciones(observaciones);
+        ultimoTraslado.setUsuarioidUsuarioRecibe(usuarioRecibeP);
 
-        logger.info("se inicia insercion del nuevo traslado");
-        trasladoFacade.create(nuevoTraslado);
-        logger.info("se finaliza insercion del nuevo traslado");
+        logger.info("se inicia actualizacion del nuevo traslado");
+        trasladoFacade.edit(ultimoTraslado);
+        logger.info("se finaliza actualizacion del nuevo traslado");
 
         //verificamos si se se trata de un peritaje, lo cual finaliza la cc.
-        if (nuevoTraslado.getTipoMotivoidMotivo().getTipoMotivo().equals("Peritaje")) {
-            if (uSesion.getCargoidCargo().getNombreCargo().equals("Tecnico") || uSesion.getCargoidCargo().getNombreCargo().equals("Perito")) {
+        if (ultimoTraslado.getTipoMotivoidMotivo().getTipoMotivo().equals("Peritaje")) {
+            if (uSesion.getCargoidCargo().getNombreCargo().equals("Técnico") || uSesion.getCargoidCargo().getNombreCargo().equals("Perito")) {
                 logger.info("se realiza peritaje, por tanto se finaliza la cc.");
 
                 formulario.setBloqueado(true);
@@ -347,7 +355,7 @@ public class FormularioEJB implements FormularioEJBLocal {
     //Función que crea el formulario
     // el String de retorno se muentra como mensaje en la vista.
     @Override
-    public String crearFormulario(String ruc, String rit, int nue, int nParte, String cargo, String delito, String direccionSS, String lugar, String unidad, String levantadoPor, String rut, Date fecha, String observacion, String descripcion, Usuario digitador) {
+    public String crearFormulario(String codEvidencia, String evidencia, String motivo, String ruc, String rit, int nue, int nParte, String cargo, String delito, String direccionSS, String lugar, String unidad, String levantadoPor, String rut, Date fecha, String observacion, String descripcion, Usuario digitador) {
 
         //Verificando nue
         if (nue > 0) {
@@ -373,6 +381,13 @@ public class FormularioEJB implements FormularioEJBLocal {
             return "Campos erróneos.";
         }
 
+        //match con motivo
+        TipoMotivo motivoP = tipoMotivoFacade.findByTipoMotivo(motivo);
+        if (motivoP == null) {
+            logger.exiting(this.getClass().getName(), "crearFormulario", "Error con motivo de entrega.");
+            return "Error con motivo de entrega.";
+        }
+
         //ruc - rit- nparte - obs y descripcion no son obligatorios
         Usuario usuarioIngresar = new Usuario();
         //Verificando en la base de datos si existe el usuario con ese rut
@@ -386,13 +401,19 @@ public class FormularioEJB implements FormularioEJBLocal {
                 return "No se pudo crear el nuevo usuario";
             }
         } else //Existe, y hay que verificar que los datos ingresador concuerdan con los que hay en la base de datos
-        {
-            if (!usuarioIngresar.getCargoidCargo().getNombreCargo().equals(cargo) || !usuarioIngresar.getNombreUsuario().equals(levantadoPor)) {
+         if (!usuarioIngresar.getCargoidCargo().getNombreCargo().equals(cargo) || !usuarioIngresar.getNombreUsuario().equals(levantadoPor)) {
                 return "Datos nos coinciden con el rut";
             }
-        }
 
         Formulario nuevoFormulario = new Formulario();
+        Semaforo estadoInicial;
+        switch (motivo) {
+            case "Peritaje":
+                estadoInicial = semaforoFacade.findByColor("Amarillo");
+                break;
+            default:
+                estadoInicial = semaforoFacade.findByColor("Rojo");
+        }
 
         nuevoFormulario.setDireccionFotografia("C:");
         nuevoFormulario.setFechaIngreso(new Date(System.currentTimeMillis()));
@@ -412,10 +433,67 @@ public class FormularioEJB implements FormularioEJBLocal {
         nuevoFormulario.setLugarLevantamiento(lugar);
         nuevoFormulario.setDireccionSS(direccionSS);
         nuevoFormulario.setBloqueado(false);
+        nuevoFormulario.setSemaforoidSemaforo(estadoInicial);
+
+        //---- match evidencia
+        String nombreArea = null;
+        int areaEvidencia = Integer.parseInt(codEvidencia); //confiemos en que no habra problema al parsear.
+        if (areaEvidencia >= 1 && areaEvidencia <= 4) {//clinica 1-2-3-4 ->  Clínica SML  
+            nombreArea = "Clínica SML";
+        }
+        if (areaEvidencia >= 5 && areaEvidencia <= 9) { //tanatologia 5-6-7-8-9 -> Tanatología SML
+            nombreArea = "Tanatología SML";
+        }
+        Area areaEvid = areaFacade.findByArea(nombreArea);
+        if (areaEvid == null) {
+            logger.exiting(this.getClass().getName(), "crearFormulario", "problema al cargar el area de la evidencia");
+            return "Ocurrió un problema al cargar el área de la evidencia.";
+        }
+
+        String nombreTipoEvid = null;
+        if (areaEvidencia == 1 || areaEvidencia == 6) {
+            nombreTipoEvid = "Biológica";
+        }
+        if (areaEvidencia == 2 || areaEvidencia == 7) {
+            nombreTipoEvid = "Vestuario";
+        }
+        if (areaEvidencia == 3 || areaEvidencia == 8) {
+            nombreTipoEvid = "Artefacto";
+        }
+        if (areaEvidencia == 5) {
+            nombreTipoEvid = "Elemento balístico";
+        }
+        if (areaEvidencia == 9) {
+            nombreTipoEvid = "Otros";
+        }
+
+        TipoEvidencia tipoEvid = tipoEvidenciaFacade.findByNombreAndTipoEvidencia(nombreTipoEvid, areaEvid);
+
+        Evidencia evidenciaP = evidenciaFacade.findByNombreAndTipoEvidencia(evidencia, tipoEvid);
+        if (evidenciaP == null) {
+            logger.exiting(this.getClass().getName(), "crearFormulario", "problema al cargar la evidencia");
+            return "Ocurrió un problema al cargar la evidencia.";
+        }
 
         logger.finest("se inicia la persistencia del nuevo formulario");
         formularioFacade.create(nuevoFormulario);
         logger.finest("se finaliza la persistencia del nuevo formulario");
+
+        //agregando la evidencia
+        List<Evidencia> listaEvidencias = new ArrayList<>();
+        listaEvidencias.add(evidenciaP);
+        nuevoFormulario.setEvidenciaList(listaEvidencias);
+        formularioFacade.edit(nuevoFormulario);
+
+        //creando primer traslado
+        Traslado primerTraslado = new Traslado();
+        primerTraslado.setFormularioNUE(formularioFacade.findByNue(nue));
+        primerTraslado.setTipoMotivoidMotivo(motivoP);
+        primerTraslado.setUsuarioidUsuarioEntrega(usuarioIngresar);
+        logger.finest("se inicia la persistencia del primer traslado");
+        trasladoFacade.create(primerTraslado);
+        logger.finest("se finaliza la persistencia del primer traslado");
+
         logger.exiting(this.getClass().getName(), "crearFormulario", true);
         return "Exito";
 
@@ -465,66 +543,81 @@ public class FormularioEJB implements FormularioEJBLocal {
         System.out.println("EJB rit " + rit);
         System.out.println("EJB parte " + parte);
         System.out.println("EJB obs " + obsEdicion);
-        if (parte > 0 || rit != null || rit != null || obsEdicion != null) {
 
-            //verificando que el usuario que edita si haya participado en la cc.
-            if (!esParticipanteCC(formulario, usuarioSesion)) {
-                logger.exiting(this.getClass().getName(), "edicionFormulario", "usuario no ha participado en cc");
-                return "Ud no ha participado en esta cadena de custodia.";
-            }
-
-            //Creando el objeto edicion
-            EdicionFormulario edF = new EdicionFormulario();
-
-            edF.setFormularioNUE(formulario);
-            edF.setUsuarioidUsuario(usuarioSesion);
-            edF.setObservaciones(obsEdicion);
-            edF.setFechaEdicion(new Date(System.currentTimeMillis()));
-
-            //Actualizando ultima edicion formulario
-            formulario.setUltimaEdicion(edF.getFechaEdicion());
-
-            if (obsEdicion != null && parte <= 0 && ruc == null && rit == null) {
-                logger.exiting(this.getClass().getName(), "edicionFormulario", "falta observación.");
-                return "Se requiere la observación.";
-            }
-
-            if (obsEdicion != null) {
-                edicionFormularioFacade.edit(edF);
-                formularioFacade.edit(formulario);
-                logger.log(Level.INFO, "se ha insertado observacion {0}", formulario.getObservaciones());
-            }
-
-            if (parte > 0) {
-                edF.setObservaciones("Se ingresa número de parte: " + parte);
-                edicionFormularioFacade.edit(edF);
-                formulario.setNumeroParte(parte);
-                formularioFacade.edit(formulario);
-                logger.log(Level.INFO, "se ha insertado n Parte {0}", formulario.getNumeroParte());
-            }
-
-            if (rit != null && !rit.equals("") && validacionEJB.checkRucOrRit(rit)) {
-                edF.setObservaciones("Se ingresa R.I.T: " + rit);
-                edicionFormularioFacade.edit(edF);
-                formulario.setRit(rit);
-                formularioFacade.edit(formulario);
-                logger.log(Level.INFO, "se ha insertado rit {0}", formulario.getRit());
-            }
-
-            if (ruc != null && !ruc.equals("") && validacionEJB.checkRucOrRit(ruc)) {
-                edF.setObservaciones("Se ingresa R.U.C.: " + ruc);
-                edicionFormularioFacade.edit(edF);
-                formulario.setRuc(ruc);
-                formularioFacade.edit(formulario);
-                logger.log(Level.INFO, "se ha insertado ruc {0}", formulario.getRuc());
-            }
-
-            logger.exiting(this.getClass().getName(), "edicionFormulario", "Exito");
-            return "Exito";
-        } else {
-            logger.exiting(this.getClass().getName(), "edicionFormulario", "falta observación.");
-            return "Se requiere la observación.";
+        if (obsEdicion.equals("") && parte == 0 && ruc == null && rit == null) { //si no viene ningún campo, al menos se necesita observacion
+            logger.exiting(this.getClass().getName(), "edicionFormulario", "requiere observacion");
+            return "Se requiere observación.";
         }
+
+        
+
+        if (!obsEdicion.equals("")) {
+            //Creando el objeto edicion
+            EdicionFormulario edFObs = new EdicionFormulario();
+
+            edFObs.setFormularioNUE(formulario);
+            edFObs.setUsuarioidUsuario(usuarioSesion);
+            edFObs.setFechaEdicion(new Date(System.currentTimeMillis()));
+            edFObs.setObservaciones(obsEdicion + "");
+            //Actualizando ultima edicion formulario
+            formulario.setUltimaEdicion(edFObs.getFechaEdicion());
+            
+            edFObs.setObservaciones(obsEdicion);
+            edicionFormularioFacade.create(edFObs);
+            formularioFacade.edit(formulario);
+            logger.log(Level.INFO, "AAAAAAAAAAAAAA se inserto observacion {0}", obsEdicion);
+        }
+        if (parte > 0) {
+            EdicionFormulario edFParte = new EdicionFormulario();
+
+            edFParte.setFormularioNUE(formulario);
+            edFParte.setUsuarioidUsuario(usuarioSesion);
+            edFParte.setFechaEdicion(new Date(System.currentTimeMillis()));
+            edFParte.setObservaciones(obsEdicion + "");
+            //Actualizando ultima edicion formulario
+            formulario.setUltimaEdicion(edFParte.getFechaEdicion());
+            
+            edFParte.setObservaciones("Se ingresa N° parte: " + parte);
+            edicionFormularioFacade.create(edFParte);
+            formulario.setNumeroParte(parte);
+            formularioFacade.edit(formulario);
+            logger.log(Level.INFO, "se ha insertado n Parte {0}", formulario.getNumeroParte());
+        } 
+        if (rit != null && !rit.equals("") && validacionEJB.checkRucOrRit(rit)) {
+            EdicionFormulario edFRit = new EdicionFormulario();
+
+            edFRit.setFormularioNUE(formulario);
+            edFRit.setUsuarioidUsuario(usuarioSesion);
+            edFRit.setFechaEdicion(new Date(System.currentTimeMillis()));
+            edFRit.setObservaciones(obsEdicion + "");
+            //Actualizando ultima edicion formulario
+            formulario.setUltimaEdicion(edFRit.getFechaEdicion());
+            
+            edFRit.setObservaciones("Se ingresa R.I.T: " + rit);
+            edicionFormularioFacade.create(edFRit);
+            formulario.setRit(rit);
+            formularioFacade.edit(formulario);
+            logger.log(Level.INFO, "se ha insertado rit {0}", formulario.getRit());
+        } 
+        if (ruc != null && !ruc.equals("") && validacionEJB.checkRucOrRit(ruc)) {
+            EdicionFormulario edFRuc = new EdicionFormulario();
+
+            edFRuc.setFormularioNUE(formulario);
+            edFRuc.setUsuarioidUsuario(usuarioSesion);
+            edFRuc.setFechaEdicion(new Date(System.currentTimeMillis()));
+            edFRuc.setObservaciones(obsEdicion + "");
+            //Actualizando ultima edicion formulario
+            formulario.setUltimaEdicion(edFRuc.getFechaEdicion());
+            
+            edFRuc.setObservaciones("Se ingresa R.U.C.: " + ruc);
+            edicionFormularioFacade.create(edFRuc);
+            formulario.setRuc(ruc);
+            formularioFacade.edit(formulario);
+            logger.log(Level.INFO, "se ha insertado ruc {0}", formulario.getRuc());
+        }
+
+        logger.exiting(this.getClass().getName(), "edicionFormulario", "Exito");
+        return "Exito";
 
     }
 
@@ -558,6 +651,49 @@ public class FormularioEJB implements FormularioEJBLocal {
 
         logger.exiting(this.getClass().getName(), "obtenerParticipantesCC", false);
         return false;
+    }
+
+    @Override
+    public List<Formulario> findByNParteRR(String input, String aBuscar) {
+
+        List<Formulario> formulariosList = new ArrayList<>();
+
+        if (input.equals("") || aBuscar.equals("")) {
+            return formulariosList;
+        }
+
+        switch (aBuscar) {
+            case "NumeroParte":
+                if (validacionEJB.esNumero(input)) { //si no son solo numeros, retorna lista vacía.
+                    formulariosList = formularioFacade.findByNParte(Integer.parseInt(input));
+                }
+                break;
+            case "Ruc":
+                if (validacionEJB.checkRucOrRit(input)) { //si no es un ruc valido, retorna lista vacia
+                    formulariosList = formularioFacade.findByRuc(input);
+                }
+                break;
+            default:
+                //es rit
+                if (validacionEJB.checkRucOrRit(input)) { //si no es un rit valido, retorna lista vacia
+                    formulariosList = formularioFacade.findByRit(input);
+                }
+                break;
+        }
+        return formulariosList;
+    }
+
+    private Traslado ultimoTraslado(int nue) {
+        logger.setLevel(Level.ALL);
+        logger.entering(this.getClass().getName(), "ultimoTraslado", nue);
+        Traslado traslado = null;
+        Formulario f = formularioFacade.find(nue);
+        if (f != null) {
+            List<Traslado> trasladosList = f.getTrasladoList();
+            traslado = trasladosList.get(trasladosList.size() - 1);
+        }
+        logger.exiting(this.getClass().getName(), "ultimoTraslado", traslado.toString());
+        return traslado;
     }
 
 }

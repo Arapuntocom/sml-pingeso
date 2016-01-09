@@ -5,9 +5,7 @@
  */
 package ejb;
 
-import entity.Formulario;
 import java.util.Date;
-import java.util.List;
 import javax.ejb.Local;
 
 /**
@@ -26,8 +24,6 @@ public interface ValidacionEJBLocal {
     boolean checkRucOrRit(String rucOrRit);
 
     boolean esNumero(String numero);
-
-    List<Formulario> findByNParteRR(String input, String aBuscar);
 
     boolean validarEmail(String email);
 

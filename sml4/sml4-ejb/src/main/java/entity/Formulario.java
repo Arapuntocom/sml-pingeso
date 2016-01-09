@@ -60,7 +60,7 @@ public class Formulario implements Serializable {
     @Column(name = "NUE")
     private Integer nue;
     @Column(name = "fechaIngreso")
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date fechaIngreso;
     @Size(max = 45)
     @Column(name = "RUC")
@@ -72,7 +72,7 @@ public class Formulario implements Serializable {
     @Column(name = "direccionFotografia")
     private String direccionFotografia;
     @Column(name = "fechaOcurrido")
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date fechaOcurrido;
     @Size(max = 50)
     @Column(name = "lugarLevantamiento")
