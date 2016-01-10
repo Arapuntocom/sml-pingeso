@@ -144,7 +144,14 @@ public class TodoPeritoMB {
         logger.setLevel(Level.ALL);
         logger.entering(this.getClass().getName(), "recibirCadena");
         httpServletRequest.getSession().setAttribute("nueF", this.nue);
-        httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.usuarioSis);       
+        httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.usuarioSis); 
+        
+        //si el siguiente traslado es para peritaje, enviamos a la vista para recibir para peritaje 
+        if(trasladosList.get(trasladosList.size()-1).getTipoMotivoidMotivo().getTipoMotivo().equals("Peritaje")){
+            logger.exiting(this.getClass().getName(), "recibirCadena", "recibirPeritoETP");
+            return "recibirPeritoETP?faces-redirect=true";
+        }
+        //como no el siguiente traslado no era para peritaje, enviamos a la vista donde se indica el motivo del siguiente traslado.
         logger.exiting(this.getClass().getName(), "recibirCadena", "recibirPeritoET");
         return "recibirPeritoET?faces-redirect=true";
     }

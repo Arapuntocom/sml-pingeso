@@ -12,6 +12,7 @@ import javax.ejb.EJB;
 import javax.inject.Named;
 import javax.enterprise.context.RequestScoped;
 import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
  
@@ -21,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Named(value = "buscadorJefeAreaMB")
 @RequestScoped
+@ManagedBean
 public class BuscadorJefeAreaMB {
  
     @EJB

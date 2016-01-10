@@ -119,16 +119,17 @@ public class RecibirPeritoMB {
         this.usuarioEntregaCargo = userEntrega.getCargoidCargo().getNombreCargo();
         this.usuarioEntregaRut = userEntrega.getRutUsuario();
         
+        this.motivo = "ninguno";
+        //this.motivo = trasladosList.get(trasladosList.size()-1).getTipoMotivoidMotivo().getTipoMotivo();
+        
         logger.exiting(this.getClass().getName(), "cargarDatosPerito");
     }
 
-    /*public String agregarTraslado() {
+    public String agregarTraslado() {
         logger.setLevel(Level.ALL);
-        logger.entering(this.getClass().getName(), "agregarTrasladoPerito");
-        logger.log(Level.FINEST, "rut usuario entrega {0}", this.usuarioEntrega);
-        logger.log(Level.FINEST, "rut usuario recibe {0}", this.usuarioRecibe);
-        logger.log(Level.FINEST, "rut motivo {0}", this.motivo);
-        String resultado = formularioEJB.crearTraslado(formulario, usuarioEntrega, usuarioEntregaUnidad, usuarioEntregaCargo, usuarioEntregaRut, usuarioRecibe, usuarioRecibeUnidad, usuarioRecibeCargo, usuarioRecibeRut, fechaT, observacionesT, motivo, usuarioSesion);
+        logger.entering(this.getClass().getName(), "agregarTrasladoPerito");         
+        
+        String resultado = formularioEJB.crearTraslado(formulario, usuarioEntrega, usuarioEntregaCargo, usuarioEntregaRut, usuarioRecibe, usuarioRecibeCargo, usuarioRecibeRut, fechaT, observacionesT, motivo, usuarioSesion);
         if (resultado.equals("Exito")) {
             httpServletRequest.getSession().setAttribute("nueF", this.nue);
             logger.exiting(this.getClass().getName(), "agregarTrasladoPerito", "todoPerito?faces-redirect=true");
@@ -137,7 +138,7 @@ public class RecibirPeritoMB {
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, resultado, "Uno o más datos inválidos"));
         logger.exiting(this.getClass().getName(), "agregarTrasladoPerito", "");
         return "";
-    }*/
+    }
 
     public String salir() {
         logger.setLevel(Level.ALL);

@@ -74,7 +74,7 @@ public class FormularioEJB implements FormularioEJBLocal {
         Usuario usuarioPoseedor = formulario.getUsuarioidUsuarioInicia(); //usuario que inicia el formulario
         //Comparando fechas entre traslados
         if (!trasladoList.isEmpty()) {
-            usuarioPoseedor = trasladoList.get(trasladoList.size() - 1).getUsuarioidUsuarioRecibe();  //último usuario que recibió            
+            usuarioPoseedor = trasladoList.get(trasladoList.size() - 1).getUsuarioidUsuarioEntrega();            
         }
         logger.exiting(this.getClass().getName(), "obtenerPoseedorFormulario", usuarioPoseedor.toString());
         return usuarioPoseedor;
@@ -141,8 +141,9 @@ public class FormularioEJB implements FormularioEJBLocal {
         return null;
     }
 
+    //Acondicionado para la nueva regla de negocio
     @Override
-    public String crearTraslado(Formulario formulario, String usuarioEntrega, String usuarioEntregaCargo, String usuarioEntregaRut, String usuarioRecibe, String usuarioRecibeCargo, String usuarioRecibeRut, Date fechaT, String observaciones, String motivo, Usuario uSesion) {
+    public String crearTraslado(Formulario formulario, String usuarioEntrega, String usuarioEntregaCargo, String usuarioEntregaRut, String usuarioRecibe, String usuarioRecibeCargo, String usuarioRecibeRut, Date fechaT, String observaciones, String motivoNext, Usuario uSesion) {
         logger.setLevel(Level.ALL);
         logger.entering(this.getClass().getName(), "crearTraslado");
 
@@ -157,19 +158,20 @@ public class FormularioEJB implements FormularioEJBLocal {
             return "Imposible agregar traslado, esta cadena de custodia se encuentra cerrada.";
         }
 
-        if (usuarioEntrega == null || usuarioEntregaCargo == null || usuarioEntregaRut == null || usuarioRecibe == null || usuarioRecibeCargo == null || usuarioRecibeRut == null || motivo == null) {
+        //verificamos la existencia de los datos.
+        if (usuarioEntrega == null || usuarioEntregaCargo == null || usuarioEntregaRut == null || usuarioRecibe == null || usuarioRecibeCargo == null || usuarioRecibeRut == null || motivoNext == null) {
             logger.exiting(this.getClass().getName(), "crearTraslado", "Campos null");
             return "Faltan campos";
         }
 
         //Validando usuario que entrega
-        if (!validacionEJB.soloCaracteres(usuarioEntregaRut) || !validacionEJB.soloCaracteres(usuarioEntrega) || !validacionEJB.soloCaracteres(usuarioEntregaCargo)) {
+        if (!validacionEJB.val(usuarioEntregaRut) || !validacionEJB.soloCaracteres(usuarioEntrega) || !validacionEJB.soloCaracteres(usuarioEntregaCargo)) {
             logger.exiting(this.getClass().getName(), "crearTraslado", "Error verificacion datos usuario entrega");
             return "Error datos usuario entrega";
         }
 
         //Validando usuario que recibe
-        if (!validacionEJB.val(usuarioRecibeRut) || !validacionEJB.val(usuarioRecibe) || !validacionEJB.val(usuarioRecibeCargo)) {
+        if (!validacionEJB.val(usuarioRecibeRut) || !validacionEJB.soloCaracteres(usuarioRecibe) || !validacionEJB.soloCaracteres(usuarioRecibeCargo)) {
             logger.exiting(this.getClass().getName(), "crearTraslado", "Error verificacion datos usuario recibe");
             return "Error datos usuario recibe";
         }
@@ -178,7 +180,7 @@ public class FormularioEJB implements FormularioEJBLocal {
         List<Traslado> trasladoList = traslados(formulario);
 
         //Comparando fechas entre traslados
-        if (!trasladoList.isEmpty() && !validacionEJB.compareFechas(fechaT, trasladoList.get(trasladoList.size() - 1).getFechaEntrega())) {
+        if (!trasladoList.isEmpty() && trasladoList.size()>=2 && !validacionEJB.compareFechas(fechaT, trasladoList.get(trasladoList.size() - 2).getFechaEntrega())) {
             logger.exiting(this.getClass().getName(), "crearTraslado", "Error con Fecha");
             return "Error, la fecha del nuevo traslado debe ser igual o posterior a la ultima fecha de traslado.";
         }
@@ -189,12 +191,12 @@ public class FormularioEJB implements FormularioEJBLocal {
             return "Error, la fecha de traslado debe ser igual o posterior a la fecha del formulario.";
         }
 
-        //traer usuarios, motivo
-        TipoMotivo motivoP = tipoMotivoFacade.findByTipoMotivo(motivo);
-        if (motivoP == null) {
-            logger.exiting(this.getClass().getName(), "crearTraslado", "Error con Motivo de Traslado");
-            return "Error, se requiere especificar Motivo del traslado.";
-        }
+//        //traer usuarios, motivo
+//        TipoMotivo motivoP = tipoMotivoFacade.findByTipoMotivo(motivo);
+//        if (motivoP == null) {
+//            logger.exiting(this.getClass().getName(), "crearTraslado", "Error con Motivo de Traslado");
+//            return "Error, se requiere especificar Motivo del traslado.";
+//        }
 
         Usuario usuarioEntregaP = null;
         Usuario usuarioRecibeP = null;
@@ -237,22 +239,42 @@ public class FormularioEJB implements FormularioEJBLocal {
         ultimoTraslado.setObservaciones(observaciones);
         ultimoTraslado.setUsuarioidUsuarioRecibe(usuarioRecibeP);
 
-        logger.info("se inicia actualizacion del nuevo traslado");
-        trasladoFacade.edit(ultimoTraslado);
-        logger.info("se finaliza actualizacion del nuevo traslado");
+        
 
         //verificamos si se se trata de un peritaje, lo cual finaliza la cc.
         if (ultimoTraslado.getTipoMotivoidMotivo().getTipoMotivo().equals("Peritaje")) {
             if (uSesion.getCargoidCargo().getNombreCargo().equals("Técnico") || uSesion.getCargoidCargo().getNombreCargo().equals("Perito")) {
                 logger.info("se realiza peritaje, por tanto se finaliza la cc.");
 
+                Semaforo semVerde = semaforoFacade.findByColor("Verde");
+                if(semVerde == null){
+                    logger.exiting(this.getClass().getName(), "crearTraslado", "No se encontro semaforo Verde");
+                    return "Error al modificar estado del semaforo.";
+                }
+                formulario.setSemaforoidSemaforo(semVerde);
                 formulario.setBloqueado(true);
                 logger.info("se inicia la edición del formulario para bloquearlo");
                 formularioFacade.edit(formulario);
                 logger.info("se finaliza la edición del formulario para bloquearlo");
-
             }
+        }else{
+           TipoMotivo motivoNextP = tipoMotivoFacade.findByTipoMotivo(motivoNext);
+           if(motivoNextP == null){
+                logger.exiting(this.getClass().getName(), "crearTraslado", "No se encontro motivoNext");
+                return "Error con el motivo de traslado.";
+            }
+            Traslado siguienteTraslado = new Traslado();
+            siguienteTraslado.setUsuarioidUsuarioEntrega(usuarioRecibeP);
+            siguienteTraslado.setFormularioNUE(formulario);
+            siguienteTraslado.setTipoMotivoidMotivo(motivoNextP);
+            logger.info("se inicia la creacion del siguiente traslado");
+            trasladoFacade.create(siguienteTraslado);
+            logger.info("se finaliza la creacion del siguiente traslado");
         }
+        
+        logger.info("se inicia actualizacion del traslado");
+        trasladoFacade.edit(ultimoTraslado);
+        logger.info("se finaliza actualizacion del traslado");
 
         logger.exiting(this.getClass().getName(), "crearTraslado", "Exito");
         return "Exito";
@@ -633,20 +655,19 @@ public class FormularioEJB implements FormularioEJBLocal {
             logger.log(Level.INFO, "formulario ''{0}'' no registra traslados", formulario.getNue());
             logger.exiting(this.getClass().getName(), "obtenerParticipantesCC", false);
             return false;
-        }
+        }        
         for (int i = 0; i < traslados.size(); i++) {
-            if (traslados.get(i).getUsuarioidUsuarioRecibe().equals(usuario)) {
+            if (traslados.get(i).getUsuarioidUsuarioRecibe() != null && traslados.get(i).getUsuarioidUsuarioRecibe().equals(usuario)) {
                 logger.exiting(this.getClass().getName(), "obtenerParticipantesCC", true);
                 return true;
             }
-        }
-        for (int i = 0; i < traslados.size(); i++) { //util solo para caso del digitador, ya que no se asegura que quien inicia o recibe sea el mismo que entrega.
             if (traslados.get(i).getUsuarioidUsuarioEntrega().equals(usuario)) {
                 logger.exiting(this.getClass().getName(), "obtenerParticipantesCC", true);
                 return true;
             }
         }
-
+        
+        
         logger.exiting(this.getClass().getName(), "obtenerParticipantesCC", false);
         return false;
     }
@@ -687,8 +708,10 @@ public class FormularioEJB implements FormularioEJBLocal {
         Traslado traslado = null;
         Formulario f = formularioFacade.find(nue);
         if (f != null) {
-            List<Traslado> trasladosList = f.getTrasladoList();
-            traslado = trasladosList.get(trasladosList.size() - 1);
+            List<Traslado> trasladosList = trasladoFacade.findByNue(f);
+            if(!trasladosList.isEmpty()){
+                traslado = trasladosList.get(trasladosList.size() - 1);
+            }
         }
         logger.exiting(this.getClass().getName(), "ultimoTraslado", traslado.toString());
         return traslado;

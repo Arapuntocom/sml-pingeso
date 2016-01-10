@@ -55,6 +55,14 @@ public class InicioSesionMB {
         String response = validacionEJB.verificarUsuario(user, pass);
 
         if (!response.equals("")) {
+
+            if (response.equals("off")) {
+
+                logger.log(Level.FINEST, "login1 false user: {0}", this.user);
+                logger.exiting(this.getClass().getName(), "login1", "");
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Usuario se encuentra inactivo"));
+                return "";
+            }
             httpServletRequest.getSession().setAttribute("cuentaUsuario", this.user);
             //guardo la cuenta de usuario para entregarla a la otra vista
             logger.log(Level.FINEST, "usuario: {0}", this.user);

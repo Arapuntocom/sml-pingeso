@@ -35,7 +35,7 @@
 
                             <li role="presentation" class="active" ><h:commandLink id="cs3" action="#{semaforoJefeAreaMB.semaforo()}" value="Semáforo"></h:commandLink></li>
 
-                            <li role="presentation"><h:commandLink id="cs4" action="#{semaforoJefeAreaMB.estadisticas()}" value="Estadisticas"></h:commandLink></li>
+                            <li role="presentation"><h:commandLink id="cs4" action="#{semaforoJefeAreaMB.estadisticas()}" value="Estadísticas"></h:commandLink></li>
 
                             <li role="presentation"> <h:commandLink id="cs5" action="#{semaforoJefeAreaMB.salir()}" value="Cerrar sesión"></h:commandLink> </li>
 
@@ -74,13 +74,13 @@
                                     <br />
                                     <div align="center">
 
-                                        <p:dataTable emptyMessage="No se han creado formularios" var="listaFormulario" value="#{semaforoJefeAreaMB.formularios}" scrollRows="20" scrollable="true" liveScroll="true" scrollHeight="500" style="margin-bottom:0">
+                                        <p:dataTable emptyMessage="No se han creado formularios" var="listaFormulario" value="#{semaforoJefeAreaMB.formularios}" scrollRows="20" scrollable="true" liveScroll="true" scrollHeight="500" style="margin-bottom:0" paginator="true" rows="9">
 
-                                            <p:column headerText="N.U.E.">
+                                            <p:column headerText="N.U.E." >
                                                 <h:outputText value="#{listaFormulario.nue}"/>                                                
                                             </p:column>
 
-                                            <p:column headerText="Iniciador">
+                                            <p:column headerText="Iniciador" >
                                                 <h:outputText value="#{listaFormulario.usuarioidUsuarioInicia.nombreUsuario}"/>                                                
                                             </p:column>
 

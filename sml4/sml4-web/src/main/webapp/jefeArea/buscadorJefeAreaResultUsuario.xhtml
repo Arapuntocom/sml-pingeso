@@ -36,7 +36,7 @@
  
                             <li role="presentation"><h:commandLink id="cs3" action="#{resultadoBuscadorUserJefeaAreaMB.semaforo()}" value="Semáforo"></h:commandLink></li>
  
-                            <li role="presentation"><h:commandLink id="cs4" action="#{resultadoBuscadorUserJefeaAreaMB.estadisticas()}" value="Estadisticas"></h:commandLink></li>
+                            <li role="presentation"><h:commandLink id="cs4" action="#{resultadoBuscadorUserJefeaAreaMB.estadisticas()}" value="Estadísticas"></h:commandLink></li>
  
                             <li role="presentation"> <h:commandLink id="cs5" action="#{resultadoBuscadorUserJefeaAreaMB.salir()}" value="Cerrar sesión"></h:commandLink> </li>
  
@@ -101,6 +101,7 @@
                                         <h:commandButton value="Habilitar" label="Habilitar" action = "#{resultadoBuscadorUserJefeaAreaMB.habilitarUsuario()}" ></h:commandButton>
                                         <p:spacer width="50" height="10" />
                                         <h:commandButton value="Deshabilitar" label="Deshabilitar" action = "#{resultadoBuscadorUserJefeaAreaMB.deshabilitarUsuario()}" ></h:commandButton>
+                                        
                                     </div>
                                     <br />
                                     <p:messages id="messages" showDetail="true" autoUpdate="true" closable="true" />

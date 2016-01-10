@@ -128,18 +128,25 @@ public class UsuarioEJB implements UsuarioEJBLocal {
         return "Exito";
     }
 
-    //OJO ARREGLAR EL INICIO DE SESION SI EL USUARIO ESTA INACTIVO NO PUEDE INGRESAR EN SU CUENTA OJOJOJOJOJOJOJOJO !!!!!!!!!!!!
     @Override
     public boolean edicionEstadoUsuario(String rut, String estado) {
 
-        Usuario usuario = new Usuario();
-        usuario = usuarioFacade.findByRUN(rut);
+        Usuario usuario = usuarioFacade.findByRUN(rut);
         if (usuario == null) {
             return false;
         }
         if (estado.equals("Activo")) {
+
+            if (usuario.getEstadoUsuario() == true) {
+                return false;
+            }
+
             usuario.setEstadoUsuario(Boolean.TRUE);
         } else {
+
+            if (usuario.getEstadoUsuario() == false) {
+                return false;
+            }
             usuario.setEstadoUsuario(Boolean.FALSE);
         }
 
@@ -241,5 +248,4 @@ public class UsuarioEJB implements UsuarioEJBLocal {
         return "Exito";
     }
 
-  
 }

@@ -35,7 +35,7 @@
                            
                             <li role="presentation"><h:commandLink id="cs2" action="#{buscadorJefeAreaMB.semaforo()}" value="Semáforo"></h:commandLink></li>
                            
-                            <li role="presentation"><h:commandLink id="cs3" action="#{buscadorJefeAreaMB.estadisticas()}" value="Estadisticas"></h:commandLink></li>
+                            <li role="presentation"><h:commandLink id="cs3" action="#{buscadorJefeAreaMB.estadisticas()}" value="Estadísticas"></h:commandLink></li>
                            
                             <li role="presentation"> <h:commandLink id="cs4" action="#{buscadorJefeAreaMB.salir()}" value="Cerrar sesión"></h:commandLink> </li>
  
@@ -128,12 +128,12 @@
                                     <div align="center">
  
  
-                                        <h:selectOneRadio id="check" value="#{buscadorJefeAreaMB.buscar}" required="true" requiredMessage="Ingrese que acción realizará con la evidencia">
+                                        <h:selectOneRadio id="check" value="#{buscadorJefeAreaMB.buscar}" required="true" requiredMessage="Debe seleccionar el tipo del valor a buscar.">
                                             <f:selectItem itemValue="Ruc" itemLabel="R.U.C." /> <!-- agregar libreria arriba-->
                                             <f:selectItem itemValue="Rit" itemLabel="R.I.T." />
                                             <f:selectItem itemValue="NumeroParte" itemLabel="Parte" />
                                         </h:selectOneRadio><br />
-                                        <p:message for="check" display="text"/>
+                                        <p:message for="check" display="text"/><!-- mensaje que viene del mb -->
  
  
                                         <h:panelGrid columns="4" cellpadding="5" class="ui-grid">
