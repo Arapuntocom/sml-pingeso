@@ -5,6 +5,8 @@
  */
 package ejb;
 
+import entity.Area;
+import entity.Cargo;
 import entity.EdicionFormulario;
 import entity.Formulario;
 import entity.Traslado;
@@ -45,5 +47,11 @@ public interface FormularioEJBLocal {
     public String edicionFormulario(Formulario formulario, String obsEdicion, Usuario usuarioSesion, int parte, String ruc, String rit);
     
     public List<Formulario> findByNParteRR(String input, String aBuscar);
+
+    public List<Formulario> findAllFormularios();
+
+    public List<Cargo> findAllCargos();
+
+    public List<Area> findAllAreas();
 }
 

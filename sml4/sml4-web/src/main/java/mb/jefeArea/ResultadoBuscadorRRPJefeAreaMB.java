@@ -2,9 +2,7 @@ package mb.jefeArea;
  
 import ejb.FormularioEJBLocal;
 import ejb.UsuarioEJBLocal;
-import entity.EdicionFormulario;
 import entity.Formulario;
-import entity.Traslado;
 import entity.Usuario;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,15 +16,17 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
+import static mb.jefeArea.BuscadorJefeAreaMB.logger;
+ 
  
 /**
  *
  * @author sebastian
  */
-@Named(value = "resultadoBuscadorTEJefeAreaMB")
+@Named(value = "resultadoBuscadorRRJefeAreaMB")
 @RequestScoped
 @ManagedBean
-public class ResultadoBuscadorTEJefeAreaMB {
+public class ResultadoBuscadorRRPJefeAreaMB {
  
     @EJB
     private FormularioEJBLocal formularioEJB;
@@ -39,68 +39,62 @@ public class ResultadoBuscadorTEJefeAreaMB {
     private HttpServletRequest httpServletRequest1;
     private FacesContext facesContext1;
  
+    private HttpServletRequest httpServletRequest2;
+    private FacesContext facesContext2;
+ 
     private String usuarioS;
     private Usuario usuarioSesion;
  
-    private int nue;
+    private String input;
+    private String buscar;
  
-    private Formulario formulario;
+    private List<Formulario> formularios;
  
-    private List<Traslado> trasladosList;
-    private List<EdicionFormulario> edicionesList;
-   
+    static final Logger logger = Logger.getLogger(ResultadoBuscadorRRPJefeAreaMB.class.getName());
  
-    static final Logger logger = Logger.getLogger(ResultadoBuscadorTEJefeAreaMB.class.getName());
+    public ResultadoBuscadorRRPJefeAreaMB() {
  
-    public ResultadoBuscadorTEJefeAreaMB() {
         logger.setLevel(Level.ALL);
-        logger.entering(this.getClass().getName(), "ResultadoBuscadorTJefeAreaMB");
-        this.trasladosList = new ArrayList<>();
-        this.edicionesList = new ArrayList<>();        
+        logger.entering(this.getClass().getName(), "ResultadoBuscadorRRJefeAreMB");
  
-        facesContext1 = FacesContext.getCurrentInstance();
-        httpServletRequest1 = (HttpServletRequest) facesContext1.getExternalContext().getRequest();
+        this.formularios = new ArrayList<>();
  
-        facesContext = FacesContext.getCurrentInstance();
-        httpServletRequest = (HttpServletRequest) facesContext.getExternalContext().getRequest();
-        if (httpServletRequest.getSession().getAttribute("nueF") != null) {
-            this.nue = (int) httpServletRequest.getSession().getAttribute("nueF");
-            logger.log(Level.FINEST, "todo nue recibido {0}", this.nue);
-        }
+        this.facesContext = FacesContext.getCurrentInstance();
+        this.httpServletRequest = (HttpServletRequest) facesContext.getExternalContext().getRequest();
  
+        this.facesContext2 = FacesContext.getCurrentInstance();
+        this.httpServletRequest2 = (HttpServletRequest) facesContext2.getExternalContext().getRequest();
+ 
+        this.facesContext1 = FacesContext.getCurrentInstance();
+        this.httpServletRequest1 = (HttpServletRequest) facesContext1.getExternalContext().getRequest();
         if (httpServletRequest1.getSession().getAttribute("cuentaUsuario") != null) {
             this.usuarioS = (String) httpServletRequest1.getSession().getAttribute("cuentaUsuario");
             logger.log(Level.FINEST, "Usuario recibido {0}", this.usuarioS);
         }
-        logger.exiting(this.getClass().getName(), "ResultadoBuscadorTJefeAreaMB");
+ 
+        if (httpServletRequest2.getSession().getAttribute("buscar") != null) {
+            this.buscar = (String) httpServletRequest2.getSession().getAttribute("buscar");
+            logger.log(Level.FINEST, "Buscar recibido {0}", this.buscar);
+        }
+ 
+        if (httpServletRequest.getSession().getAttribute("input") != null) {
+            this.input = (String) httpServletRequest.getSession().getAttribute("input");
+            logger.log(Level.FINEST, "Input recibido {0}", this.input);
+        }
+ 
+        logger.exiting(this.getClass().getName(), "ResultadoBuscadorRRJefeAreMB");
+ 
     }
  
     @PostConstruct
     public void cargarDatos() {
         logger.setLevel(Level.ALL);
         logger.entering(this.getClass().getName(), "CargarDatosJefeArea");
-        this.formulario = formularioEJB.findFormularioByNue(this.nue);
         this.usuarioSesion = usuarioEJB.findUsuarioSesionByCuenta(this.usuarioS);
-        this.trasladosList = formularioEJB.traslados(this.formulario);
-        
-        //trasladosList.remove(trasladosList.size()-1);        
-        
-        this.edicionesList = formularioEJB.listaEdiciones(this.nue);
-               
-        logger.log(Level.INFO, "formulario ruc {0}", this.formulario.getRuc());
-        logger.log(Level.FINEST, "todos cant traslados {0}", this.trasladosList.size());
+        this.formularios = formularioEJB.findByNParteRR(this.input, this.buscar);
         logger.exiting(this.getClass().getName(), "CargarDatosJefeArea");
     }
- 
-    //redirige a nuevamente a la vista de busqueda.
-    public String nuevaBusqueda() {
-        logger.setLevel(Level.ALL);
-        logger.entering(this.getClass().getName(), "nuevaBusquedaJA");
-        httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.usuarioS);
-        logger.exiting(this.getClass().getName(), "nuevaBusquedaJA", "buscadorJefeArea");
-        return "buscadorJefeArea.xhtml?faces-redirect=true";
-    }
- 
+   
      //retorna a la vista para realizar busqueda
     public String buscador() {
         logger.setLevel(Level.ALL);
@@ -133,8 +127,8 @@ public class ResultadoBuscadorTEJefeAreaMB {
     public String estadisticas(){
         return "";
     }
-   
-    public String salir() {
+ 
+     public String salir() {
         logger.setLevel(Level.ALL);
         logger.entering(this.getClass().getName(), "salirJefeArea");
         logger.log(Level.FINEST, "usuario saliente {0}", this.usuarioSesion.getNombreUsuario());
@@ -142,29 +136,31 @@ public class ResultadoBuscadorTEJefeAreaMB {
         logger.exiting(this.getClass().getName(), "salirJefeArea", "/indexListo");
         return "/indexListo?faces-redirect=true";
     }
+     
+     public String buscarFormulario(int nue) {
+        logger.setLevel(Level.ALL);
+        logger.entering(this.getClass().getName(), "buscarFormularioJefeArea");
+        logger.log(Level.INFO, "NUE CAPTURADO:{0}", nue);
+        Formulario formulario = formularioEJB.findFormularioByNue(nue);
  
-    public int getNue() {
-        return nue;
+        if (formulario != null) {
+            httpServletRequest.getSession().setAttribute("nueF", nue);
+            httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.usuarioS);
+            logger.exiting(this.getClass().getName(), "buscarFormularioJefeArea", "buscadorJefeAreaResultTE");
+            return "buscadorJefeAreaResultTE.xhtml?faces-redirect=true";
+        }
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "no existe", "Datos no válidos"));
+        logger.info("formulario no encontrado");
+        logger.exiting(this.getClass().getName(), "buscarFormularioJefeArea", "buscadorJefeArea");
+        return "";
+    }
+   
+    public String getUsuarioS() {
+        return usuarioS;
     }
  
-    public void setNue(int nue) {
-        this.nue = nue;
-    }
- 
-    public Formulario getFormulario() {
-        return formulario;
-    }
- 
-    public void setFormulario(Formulario formulario) {
-        this.formulario = formulario;
-    }
- 
-    public List<Traslado> getTrasladosList() {
-        return trasladosList;
-    }
- 
-    public void setTrasladosList(List<Traslado> trasladosList) {
-        this.trasladosList = trasladosList;
+    public void setUsuarioS(String usuarioS) {
+        this.usuarioS = usuarioS;
     }
  
     public Usuario getUsuarioSesion() {
@@ -175,12 +171,28 @@ public class ResultadoBuscadorTEJefeAreaMB {
         this.usuarioSesion = usuarioSesion;
     }
  
-    public List<EdicionFormulario> getEdicionesList() {
-        return edicionesList;
+    public String getInput() {
+        return input;
     }
  
-    public void setEdicionesList(List<EdicionFormulario> edicionesList) {
-        this.edicionesList = edicionesList;
-    }  
+    public void setInput(String input) {
+        this.input = input;
+    }
+ 
+    public String getBuscar() {
+        return buscar;
+    }
+ 
+    public void setBuscar(String buscar) {
+        this.buscar = buscar;
+    }
+ 
+    public List<Formulario> getFormularios() {
+        return formularios;
+    }
+ 
+    public void setFormularios(List<Formulario> formularios) {
+        this.formularios = formularios;
+    }
  
 }

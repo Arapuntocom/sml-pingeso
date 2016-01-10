@@ -22,4 +22,9 @@ public interface UsuarioEJBLocal {
     public String crearUsuario(String nombreUsuario, String apellidoUsuario, String rut, String pass, String mail, String cuentaUsuario, String estado, Cargo cargo, Area area);
 
     public boolean edicionEstadoUsuario(String rut, String estado);
+
+    public Usuario findUserByRut(String rut);
+    
+    public String crearUsuario(String nombreUsuario, String apellidoUsuario, String rut, String pass, String mail, String cuentaUsuario, String cargo, String area);
+        
 }

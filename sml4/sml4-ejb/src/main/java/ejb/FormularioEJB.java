@@ -549,8 +549,6 @@ public class FormularioEJB implements FormularioEJBLocal {
             return "Se requiere observación.";
         }
 
-        
-
         if (!obsEdicion.equals("")) {
             //Creando el objeto edicion
             EdicionFormulario edFObs = new EdicionFormulario();
@@ -561,7 +559,7 @@ public class FormularioEJB implements FormularioEJBLocal {
             edFObs.setObservaciones(obsEdicion + "");
             //Actualizando ultima edicion formulario
             formulario.setUltimaEdicion(edFObs.getFechaEdicion());
-            
+
             edFObs.setObservaciones(obsEdicion);
             edicionFormularioFacade.create(edFObs);
             formularioFacade.edit(formulario);
@@ -576,13 +574,13 @@ public class FormularioEJB implements FormularioEJBLocal {
             edFParte.setObservaciones(obsEdicion + "");
             //Actualizando ultima edicion formulario
             formulario.setUltimaEdicion(edFParte.getFechaEdicion());
-            
+
             edFParte.setObservaciones("Se ingresa N° parte: " + parte);
             edicionFormularioFacade.create(edFParte);
             formulario.setNumeroParte(parte);
             formularioFacade.edit(formulario);
             logger.log(Level.INFO, "se ha insertado n Parte {0}", formulario.getNumeroParte());
-        } 
+        }
         if (rit != null && !rit.equals("") && validacionEJB.checkRucOrRit(rit)) {
             EdicionFormulario edFRit = new EdicionFormulario();
 
@@ -592,13 +590,13 @@ public class FormularioEJB implements FormularioEJBLocal {
             edFRit.setObservaciones(obsEdicion + "");
             //Actualizando ultima edicion formulario
             formulario.setUltimaEdicion(edFRit.getFechaEdicion());
-            
+
             edFRit.setObservaciones("Se ingresa R.I.T: " + rit);
             edicionFormularioFacade.create(edFRit);
             formulario.setRit(rit);
             formularioFacade.edit(formulario);
             logger.log(Level.INFO, "se ha insertado rit {0}", formulario.getRit());
-        } 
+        }
         if (ruc != null && !ruc.equals("") && validacionEJB.checkRucOrRit(ruc)) {
             EdicionFormulario edFRuc = new EdicionFormulario();
 
@@ -608,7 +606,7 @@ public class FormularioEJB implements FormularioEJBLocal {
             edFRuc.setObservaciones(obsEdicion + "");
             //Actualizando ultima edicion formulario
             formulario.setUltimaEdicion(edFRuc.getFechaEdicion());
-            
+
             edFRuc.setObservaciones("Se ingresa R.U.C.: " + ruc);
             edicionFormularioFacade.create(edFRuc);
             formulario.setRuc(ruc);
@@ -696,4 +694,32 @@ public class FormularioEJB implements FormularioEJBLocal {
         return traslado;
     }
 
+    @Override
+    public List<Formulario> findAllFormularios() {
+
+        List<Formulario> formularios = new ArrayList();
+
+        formularios = formularioFacade.findAll();
+
+        return formularios;
+    }
+
+    @Override
+    public List<Cargo> findAllCargos() {
+
+        List<Cargo> cargos = new ArrayList();
+        cargos = cargoFacade.findAll();
+
+        return cargos;
+    }
+
+    @Override
+    public List<Area> findAllAreas() {
+        List<Area> areas = new ArrayList();
+        areas = areaFacade.findAll();
+
+        return areas;
+    }
+
+    
 }

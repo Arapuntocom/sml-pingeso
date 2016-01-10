@@ -16,10 +16,10 @@
                 <div class="thumbnail">
                     <div align="center"><h:outputLabel class="input-group-lg" style=" background-color: white" value="Bienvenido(a) #{buscadorJefeAreaMB.usuarioSesion.nombreUsuario}"></h:outputLabel></div>
                 </div>
-            </h:form> 
-
+            </h:form>
+ 
             <hr />
-
+ 
             <!-- Nav -->
             <div class="row" style="background:rgba(255, 255, 255, 0.8); padding:5px; border-radius: 0 0 7px 7px; margin-top:5px">
                 <div  class="col-md-3" align="center"> <!-- Barra de navegación -->
@@ -28,20 +28,26 @@
                 <div class="col-md-9"> <!-- Barra de navegación -->
                     <h:form>
                         <ul class="nav nav-tabs nav-justified">
-
-                            <li role="presentation" class="active" ><a href="buscadorJefeArea.xhtml">Buscar Cadena de Custodia</a></li>   
-
-                            <li role="presentation"> <h:commandLink id="cs" action="#{buscadorJefeAreaMB.salir()}" value="Cerrar sesión"></h:commandLink> </li>
-
+ 
+                            <li role="presentation" class="active" > <h:commandLink id="cs" action="#{buscadorJefeAreaMB.buscador()}" value="Buscar"></h:commandLink> </li>  
+                       
+                            <li role="presentation"><h:commandLink id="cs1" action="#{buscadorJefeAreaMB.crearUsuario()}" value="Crear usuario"></h:commandLink></li>  
+                           
+                            <li role="presentation"><h:commandLink id="cs2" action="#{buscadorJefeAreaMB.semaforo()}" value="Semáforo"></h:commandLink></li>
+                           
+                            <li role="presentation"><h:commandLink id="cs3" action="#{buscadorJefeAreaMB.estadisticas()}" value="Estadisticas"></h:commandLink></li>
+                           
+                            <li role="presentation"> <h:commandLink id="cs4" action="#{buscadorJefeAreaMB.salir()}" value="Cerrar sesión"></h:commandLink> </li>
+ 
                         </ul>
                     </h:form>
                 </div>
-            </div>   	
-
+            </div>      
+ 
             <!-- Nav -->
             <!-- Barra lateral izquierda -->
-
-            <div class="container-fluid">       
+ 
+            <div class="container-fluid">      
                 <div class="row" style="background:rgba(255, 255, 255, 0.8); padding:5px; border-radius: 0 0 7px 7px; margin-top:10px">
                     <div class="col-md-3">
                         <p class="lead">
@@ -50,15 +56,15 @@
                         <p class="lead">
                             <img class="img-responsive" src=".../imagenes/camioneta.jpg" alt="" />
                         </p><hr />
-
+ 
                         <p class="lead">
-                            <a href="https://www.facebook.com/smlchile" target="_blank"><img class="img-responsive" src=".../imagenes/fb_logo1.png" alt=" "/></a>
-                        </p><hr />                       
+                            <a href="http://www.sml.cl/intranetsml/index.php" target="_blank"><img class="img-responsive" src=".../imagenes/intranet.jpg" alt=" "/></a>
+                        </p><hr />                      
                     </div>
-
+ 
                     <!-- Barra lateral izquierda -->
-
-
+ 
+ 
                     <!-- inicio busqueda -->
                     <div class="col-md-9">
                         <div align="center">
@@ -68,24 +74,88 @@
                                     <br />
                                     <div align="center">
                                         <h:panelGrid columns="4" cellpadding="5" class="ui-grid">
-
+ 
                                             <p:outputLabel for="nue" value="N.U.E.:" style="width:90px"></p:outputLabel>
                                             <h:inputText id="nue" style="margin-right:10px" value = "#{buscadorJefeAreaMB.nue}" rendered="true" requiredMessage="Debe ingresar el N.U.E.">
-
+ 
                                             </h:inputText>
                                             <h:commandButton value="Buscar" label="nue" action = "#{buscadorJefeAreaMB.buscarFormulario()}" ></h:commandButton>  
-
+ 
                                         </h:panelGrid>
                                     </div>
                                     <br />
                                     <p:messages id="messages" showDetail="true" autoUpdate="true" closable="true" />
-                                </h:form> 
+                                </h:form>
                             </div>
                         </div>
                     </div>
                     <!-- fin de busqueda -->
+                   
+                    <!-- inicio busqueda usuario -->
+                    <div class="col-md-9">
+                        <div align="center">
+                            <div class="thumbnail" style="width: 785px; padding: 15px;">
+                                <h4>Inicie la búsqueda de usuario</h4><br /><br />
+                                <h:form>
+                                    <br />
+                                    <div align="center">
+ 
+ 
+                                        <h:panelGrid columns="4" cellpadding="5" class="ui-grid">
+ 
+                                            <p:outputLabel for="rut" value="R.U.T.:" style="width:90px"></p:outputLabel>
+                                            <h:inputText id="rut" style="margin-right:10px" value = "#{buscadorJefeAreaMB.rut}" rendered="true" requiredMessage="Debe ingresar la búsqueda"/>
+ 
+                                            <h:commandButton value="Buscar" label="busca" action = "#{buscadorJefeAreaMB.buscarUsuario()}" ></h:commandButton>  
+ 
+                                        </h:panelGrid>
+                                    </div>
+                                    <br />
+                                    <p:messages id="messages" showDetail="true" autoUpdate="true" closable="true" />
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- fin de busqueda usuario-->
+                   
+                    <!-- inicio busqueda ruc rit parte-->
+                    <div class="col-md-9">
+                        <div align="center">
+                            <div class="thumbnail" style="width: 785px; padding: 15px;">
+                                <h4>Inicie la búsqueda de formularios</h4><br /><br />
+                                <h:form>
+                                    <br />
+                                    <div align="center">
+ 
+ 
+                                        <h:selectOneRadio id="check" value="#{buscadorJefeAreaMB.buscar}" required="true" requiredMessage="Ingrese que acción realizará con la evidencia">
+                                            <f:selectItem itemValue="Ruc" itemLabel="R.U.C." /> <!-- agregar libreria arriba-->
+                                            <f:selectItem itemValue="Rit" itemLabel="R.I.T." />
+                                            <f:selectItem itemValue="NumeroParte" itemLabel="Parte" />
+                                        </h:selectOneRadio><br />
+                                        <p:message for="check" display="text"/>
+ 
+ 
+                                        <h:panelGrid columns="4" cellpadding="5" class="ui-grid">
+ 
+                                            <p:outputLabel for="bus" value="Buscar:" style="width:90px"></p:outputLabel>
+                                            <h:inputText id="bus" style="margin-right:10px" value = "#{buscadorJefeAreaMB.input}" rendered="true" requiredMessage="Debe ingresar la búsqueda"/>
+ 
+                                            <h:commandButton value="Buscar" label="busca" action = "#{buscadorJefeAreaMB.buscarFormularioRRP()}" ></h:commandButton>  
+ 
+                                        </h:panelGrid>
+                                    </div>
+                                    <br />
+                                    <p:messages id="messages" showDetail="true" autoUpdate="true" closable="true" />
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- fin de busqueda ruc rit parte-->
+                   
+                   
                     <!-- Footer -->
-
+ 
                 </div>
                 <nav class="navbar navbar-default" role="navigation">
                     <div class="col-md-3" style="margin-top: 20px">
@@ -94,7 +164,7 @@
                         </p><br />
                     </div>
                     <div class="col-md-9">
-
+ 
                         <h5 class="pull-right">
                             Servicio Médico Legal - Avda. La Paz 1012, Independencia,
                             Santiago - Teléfono Mesa Central:
@@ -108,7 +178,7 @@
             </div>
         </div>
         <!-- Footer -->
-
-
+ 
+ 
     </h:body>
 </html>
