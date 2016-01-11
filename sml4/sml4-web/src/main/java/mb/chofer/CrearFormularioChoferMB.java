@@ -126,6 +126,7 @@ public class CrearFormularioChoferMB {
         logger.log(Level.FINEST, "usuario inicia rut {0}", this.rut);
         logger.log(Level.FINEST, "formulario fecha {0}", this.fecha);
         logger.log(Level.FINEST, "usuario inicia cargo {0}", this.cargo);
+
         String resultado = formularioEJB.crearFormulario(codTipoEvidencia, evidencias, motivo, ruc, rit, nue, parte, cargo, delito, direccionSS, lugar, unidadPolicial, levantadaPor, rut, fecha, observacion, descripcion, usuarioS);
 
         if (resultado.equals("Exito")) {
@@ -153,21 +154,21 @@ public class CrearFormularioChoferMB {
     }
 
     //redirecciona a la pagina para realizar una busqueda
-    public String buscar(){
+    public String buscar() {
         logger.entering(this.getClass().getName(), "buscar");
-        httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.usuarioSis);        
+        httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.usuarioSis);
         logger.exiting(this.getClass().getName(), "buscar", "buscadorChofer");
         return "buscadorChofer?faces-redirect=true";
     }
 
     //redirecciona a la pagina para iniciar cadena de custodia
-    public String iniciarCadena(){
+    public String iniciarCadena() {
         logger.entering(this.getClass().getName(), "iniciarCadena");
-        httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.usuarioSis);        
+        httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.usuarioSis);
         logger.exiting(this.getClass().getName(), "iniciarCadena", "choferFormulario");
         return "choferFormulario?faces-redirect=true";
     }
-    
+
     public String getMotivo() {
         return motivo;
     }
@@ -335,8 +336,6 @@ public class CrearFormularioChoferMB {
     public void setListEvidenciasx(List<String> listEvidenciasx) {
         this.listEvidenciasx = listEvidenciasx;
     }
-    
-    
 
     public void iniciarListas() {
         //biologica tanato ok
@@ -365,10 +364,9 @@ public class CrearFormularioChoferMB {
         listEvidencias6.add("Lecho ungeal");
         listEvidencias6.add("Secreciones");
         listEvidencias6.add("Sangre");
-        listEvidencias6.add("Orina");        
+        listEvidencias6.add("Orina");
         listEvidencias6.add("Otros");
 
-     
         //vestuario clinica y tanato ok
         listEvidencias2.add("Vestido");
         listEvidencias2.add("Blusa");
@@ -387,12 +385,12 @@ public class CrearFormularioChoferMB {
 
         //artefactos tanato
         listEvidencias3t.add("Protector");
-        listEvidencias3t.add("Toalla higiénica");        
+        listEvidencias3t.add("Toalla higiénica");
         listEvidencias3t.add("Arma blanca");
         listEvidencias3t.add("Cuchillo");
         listEvidencias3t.add("Sable");
         listEvidencias3t.add("Otros");
-        
+
         // balistica tanato
         listEvidencias4.add("Bala");
         listEvidencias4.add("Otros");
@@ -433,9 +431,9 @@ public class CrearFormularioChoferMB {
         listEvidenciasx.add("Otros");
 
     }
-    
+
     public List<String> cargarEvidencias(final AjaxBehaviorEvent event) {
-        logger.info("selecciono: " + codTipoEvidencia); 
+        logger.info("selecciono: " + codTipoEvidencia);
         switch (codTipoEvidencia) {
             case "1":
                 //biologica clinica
@@ -472,7 +470,7 @@ public class CrearFormularioChoferMB {
             case "9":
                 //otros tanatologia
                 listEvidenciasx = listEvidencias5;
-                return listEvidenciasx; 
+                return listEvidenciasx;
         }
         return listEvidenciasx;
     }

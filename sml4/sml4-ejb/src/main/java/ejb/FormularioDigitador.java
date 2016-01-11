@@ -8,14 +8,22 @@ package ejb;
 import static ejb.FormularioEJB.logger;
 import entity.Area;
 import entity.Cargo;
+import entity.Evidencia;
 import entity.Formulario;
+import entity.FormularioEvidencia;
+import entity.Semaforo;
+import entity.TipoEvidencia;
 import entity.TipoMotivo;
 import entity.TipoUsuario;
 import entity.Traslado;
 import entity.Usuario;
 import facade.AreaFacadeLocal;
 import facade.CargoFacadeLocal;
+import facade.EvidenciaFacadeLocal;
+import facade.FormularioEvidenciaFacadeLocal;
 import facade.FormularioFacadeLocal;
+import facade.SemaforoFacadeLocal;
+import facade.TipoEvidenciaFacadeLocal;
 import facade.TipoMotivoFacadeLocal;
 import facade.TipoUsuarioFacadeLocal;
 import facade.TrasladoFacadeLocal;
@@ -35,11 +43,18 @@ import javax.ejb.Stateless;
 public class FormularioDigitador implements FormularioDigitadorLocal {
 
     @EJB
+    private SemaforoFacadeLocal semaforoFacade;
+
+    @EJB
+    private FormularioEvidenciaFacadeLocal formularioEvidenciaFacade;
+    @EJB
+    private EvidenciaFacadeLocal evidenciaFacade;
+    @EJB
+    private TipoEvidenciaFacadeLocal tipoEvidenciaFacade;
+    @EJB
     private FormularioFacadeLocal formularioFacade;
     @EJB
-    private ValidacionEJBLocal validacionEJB;
-    @EJB
-    private UsuarioFacadeLocal usuarioFAcade;
+    private ValidacionEJBLocal validacionEJB;    
     @EJB
     private TipoUsuarioFacadeLocal tipoUsuarioFacade;
     @EJB
@@ -57,7 +72,7 @@ public class FormularioDigitador implements FormularioDigitadorLocal {
     //Función que crea el formulario
     // el String de retorno se muentra como mensaje en la vista.
     @Override
-    public String crearFormulario(String ruc, String rit, int nue, int nParte, String cargo, String delito, String direccionSS, String lugar, String unidadPolicial, String levantadoPor, String rut, Date fecha, String observacion, String descripcion, Usuario digitador) {
+    public String crearFormulario(String codEvidencia, String evidencia, String ruc, String rit, int nue, int nParte, String cargo, String delito, String direccionSS, String lugar, String unidadPolicial, String levantadoPor, String rut, Date fecha, String observacion, String descripcion, Usuario digitador) {
 
         //Verificando nue
         if (nue > 0) {
@@ -100,14 +115,18 @@ public class FormularioDigitador implements FormularioDigitadorLocal {
             if (usuarioIngresar == null) {
                 return "No se pudo crear el nuevo usuario";
             }
-        } else //Existe, y hay que verificar que los datos ingresador concuerdan con los que hay en la base de datos
-        {
-
-            if (!usuarioIngresar.getCargoidCargo().getNombreCargo().equals(cargo) || !usuarioIngresar.getNombreUsuario().equals(levantadoPor)) {
-             return "Datos nos coinciden con el rut";
-             }
-             
+        } 
+        /*else //Existe, y hay que verificar que los datos ingresador concuerdan con los que hay en la base de datos
+         if (!usuarioIngresar.getCargoidCargo().getNombreCargo().equals(cargo) || !usuarioIngresar.getNombreUsuario().equals(levantadoPor)) {
+                return "Datos nos coinciden con el rut";
+            }*/
+        
+        //match semaforo rojo         
+        Semaforo semaforoP = semaforoFacade.findByColor("Rojo");
+        if(semaforoP == null){
+            return "Ocurrió un problema al guardar los datos.";
         }
+        
         Formulario nuevoFormulario = new Formulario();
 
         nuevoFormulario.setDireccionFotografia("C:");
@@ -128,9 +147,68 @@ public class FormularioDigitador implements FormularioDigitadorLocal {
         nuevoFormulario.setLugarLevantamiento(lugar);
         nuevoFormulario.setDireccionSS(direccionSS);
         nuevoFormulario.setBloqueado(false);
+        nuevoFormulario.setSemaforoidSemaforo(semaforoP);
+        
 
         logger.finest("se inicia la persistencia del nuevo formulario");
         formularioFacade.create(nuevoFormulario);
+
+        //---- match evidencia
+        String nombreArea = null;
+        int areaEvidencia = Integer.parseInt(codEvidencia); //confiemos en que no habra problema al parsear.
+        if (areaEvidencia >= 1 && areaEvidencia <= 4) {//clinica 1-2-3-4 ->  Clínica SML  
+            nombreArea = "Clínica SML";
+        }
+        if (areaEvidencia >= 5 && areaEvidencia <= 9) { //tanatologia 5-6-7-8-9 -> Tanatología SML
+            nombreArea = "Tanatología SML";
+        }
+        Area areaEvid = areaFacade.findByArea(nombreArea);
+        if (areaEvid == null) {
+            logger.exiting(this.getClass().getName(), "crearFormulario", "problema al cargar el area de la evidencia");
+            return "Ocurrió un problema al cargar el área de la evidencia.";
+        }
+
+        String nombreTipoEvid = null;
+        if (areaEvidencia == 1 || areaEvidencia == 6) {
+            nombreTipoEvid = "Biológica";
+        }
+        if (areaEvidencia == 2 || areaEvidencia == 7) {
+            nombreTipoEvid = "Vestuario";
+        }
+        if (areaEvidencia == 3 || areaEvidencia == 8) {
+            nombreTipoEvid = "Artefacto";
+        }
+        if (areaEvidencia == 5) {
+            nombreTipoEvid = "Elemento balístico";
+        }
+        if (areaEvidencia == 4 || areaEvidencia == 9) {
+            nombreTipoEvid = "Otros";
+        }
+
+        TipoEvidencia tipoEvid = tipoEvidenciaFacade.findByNombreAndTipoEvidencia(nombreTipoEvid, areaEvid);
+        if(tipoEvid == null){
+            logger.exiting(this.getClass().getName(), "crearFormulario", "problema al cargar el tipo de evidencia");
+            return "Ocurrió un problema al cargar el tipo de evidencia.";
+        }
+
+        Evidencia evidenciaP = evidenciaFacade.findByNombreAndTipoEvidencia(evidencia, tipoEvid);
+        if (evidenciaP == null) {
+            logger.exiting(this.getClass().getName(), "crearFormulario", "problema al cargar la evidencia");
+            return "Ocurrió un problema al cargar la evidencia.";
+        }
+
+        logger.finest("se inicia la persistencia del nuevo formulario");
+        formularioFacade.create(nuevoFormulario);
+        logger.finest("se finaliza la persistencia del nuevo formulario");
+
+        //agregando la evidencia
+        FormularioEvidencia formEvid = new FormularioEvidencia();
+        formEvid.setEvidenciaidEvidencia(evidenciaP);
+        formEvid.setFormularioNUE(nuevoFormulario);
+        logger.finest("se inicia la persistencia de formularioEvidencia");
+        formularioEvidenciaFacade.create(formEvid);
+        logger.finest("se finaliza la persistencia de formularioEvidencia");
+
         logger.finest("se finaliza la persistencia del nuevo formulario");
         logger.exiting(this.getClass().getName(), "crearFormulario", true);
         return "Exito";
@@ -143,14 +221,16 @@ public class FormularioDigitador implements FormularioDigitadorLocal {
         logger.entering(this.getClass().getName(), "crearExterno");
 
         Usuario nuevoExterno = new Usuario();
-        // unidad = area se esta entregando otro
+        //area se esta entregando otro
         Area areaExterno = areaFacade.findByArea("Otro");
         TipoUsuario tue = tipoUsuarioFacade.findByTipo("Externo");
         //buscando cargo, en el caso que no exista se crea
         Cargo cargoExterno = cargoFacade.findByCargo(cargo);
-
         if (cargoExterno == null) {
-            return null;
+            cargoExterno = cargoFacade.findByCargo("Externo");
+            if(cargoExterno == null){
+                return null;
+            }
         }
         //no valido que exista ya que lo estoy sacando desde sistema, y en el caso que no existe debe ser otro
 
@@ -177,7 +257,7 @@ public class FormularioDigitador implements FormularioDigitadorLocal {
     }
 
     @Override
-    public String crearTraslado(Formulario formulario, String usuarioEntrega, String usuarioEntregaCargo, String usuarioEntregaRut, String usuarioRecibe, String usuarioRecibeCargo, String usuarioRecibeRut, Date fechaT, String observaciones, String motivo, Usuario uSesion) {
+    public String crearTraslado(Formulario formulario, Usuario usuarioInicia, String usuarioRecibe, String usuarioRecibeCargo, String usuarioRecibeRut, Date fechaT, String observaciones, String motivo, Usuario uSesion) {
         logger.setLevel(Level.ALL);
         logger.entering(this.getClass().getName(), "crearTraslado");
 
@@ -192,19 +272,14 @@ public class FormularioDigitador implements FormularioDigitadorLocal {
             return "Imposible agregar traslado, esta cadena de custodia se encuentra cerrada.";
         }
 
-        if (usuarioEntrega == null || usuarioEntregaCargo == null || usuarioEntregaRut == null || usuarioRecibe == null || usuarioRecibeCargo == null || usuarioRecibeRut == null || motivo == null) {
+        if ( usuarioRecibe == null || usuarioRecibeCargo == null || usuarioRecibeRut == null || motivo == null) {
             logger.exiting(this.getClass().getName(), "crearTraslado", "Campos null");
             return "Faltan campos";
         }
 
-        //Validando usuario que entrega
-        if (!validacionEJB.soloCaracteres(usuarioEntregaRut) || !validacionEJB.soloCaracteres(usuarioEntrega) || !validacionEJB.soloCaracteres(usuarioEntregaCargo)) {
-            logger.exiting(this.getClass().getName(), "crearTraslado", "Error verificacion datos usuario entrega");
-            return "Error datos usuario entrega";
-        }
-
+   
         //Validando usuario que recibe
-        if (!validacionEJB.val(usuarioRecibeRut) || !validacionEJB.val(usuarioRecibe) || !validacionEJB.val(usuarioRecibeCargo)) {
+        if (!validacionEJB.val(usuarioRecibeRut) || !validacionEJB.soloCaracteres(usuarioRecibe) || !validacionEJB.soloCaracteres(usuarioRecibeCargo)) {
             logger.exiting(this.getClass().getName(), "crearTraslado", "Error verificacion datos usuario recibe");
             return "Error datos usuario recibe";
         }
@@ -231,22 +306,8 @@ public class FormularioDigitador implements FormularioDigitadorLocal {
             return "Error, se requiere especificar Motivo del traslado.";
         }
 
-        Usuario usuarioEntregaP = null;
         Usuario usuarioRecibeP = null;
 
-        //Verificando usuario Entrega
-        usuarioEntregaP = usuarioFacade.findByRUN(usuarioEntregaRut);
-
-        if (usuarioEntregaP == null) {
-            usuarioEntregaP = crearExterno1(usuarioEntregaCargo, usuarioEntrega, usuarioEntregaRut);
-            if (usuarioEntregaP == null) {
-                logger.exiting(this.getClass().getName(), "crearTraslado", "Error con creacion Usuario Entrega");
-                return "Error con datos de la persona que entrega.";
-            }
-        } else if (!usuarioEntregaP.getNombreUsuario().equals(usuarioEntrega) || !usuarioEntregaP.getCargoidCargo().getNombreCargo().equals(usuarioEntregaCargo)) {
-            logger.exiting(this.getClass().getName(), "crearTraslado", "Error con verificacion Usuario Entrega");
-            return "Datos no coinciden con el rut ingresado";
-        }
         //Verificando usuario Recibe
         usuarioRecibeP = usuarioFacade.findByRUN(usuarioRecibeRut);
         if (usuarioRecibeP == null) {
@@ -255,13 +316,16 @@ public class FormularioDigitador implements FormularioDigitadorLocal {
                 logger.exiting(this.getClass().getName(), "crearTraslado", "Error con creacion usuario Recibe");
                 return "Error con datos de la persona que recibe.";
             }
-        } else if (!usuarioRecibeP.getNombreUsuario().equals(usuarioRecibe) || !usuarioRecibeP.getCargoidCargo().getNombreCargo().equals(usuarioRecibeCargo)) {
+        } 
+        /* No tiene lógica, si antes se creo un user externo con cargo Externo, casi nunca cooincidira con usuarioRecibeCargo.
+        else if (!usuarioRecibeP.getNombreUsuario().equals(usuarioRecibe) || !usuarioRecibeP.getCargoidCargo().getNombreCargo().equals(usuarioRecibeCargo)) {
             logger.exiting(this.getClass().getName(), "crearTraslado", "Error con verificacion usuario Recibe");
             return "Datos no corresponden al rut";
         }
+        */
 
         //verificando que usuario recibe sea distinto del usuario que entrega
-        if (usuarioEntregaP.equals(usuarioRecibeP)) { //si se trata del mismo usuario
+        if (usuarioInicia.getRutUsuario().equals(usuarioRecibeP.getRutUsuario())) { //si se trata del mismo usuario
             logger.exiting(this.getClass().getName(), "crearTraslado", "Usuario Entrega y Recibe son el mismo");
             return "El usuario que recibe la cadena de custodia debe ser distinto al usuario que la entrega.";
         }
@@ -273,7 +337,7 @@ public class FormularioDigitador implements FormularioDigitadorLocal {
         nuevoTraslado.setObservaciones(observaciones);
         nuevoTraslado.setTipoMotivoidMotivo(motivoP);
         nuevoTraslado.setUsuarioidUsuarioRecibe(usuarioRecibeP);
-        nuevoTraslado.setUsuarioidUsuarioEntrega(usuarioEntregaP);
+        nuevoTraslado.setUsuarioidUsuarioEntrega(usuarioInicia);
 
         logger.info("se inicia insercion del nuevo traslado");
         trasladoFacade.create(nuevoTraslado);

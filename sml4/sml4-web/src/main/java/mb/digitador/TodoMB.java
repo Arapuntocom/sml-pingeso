@@ -5,9 +5,12 @@
  */
 package mb.digitador;
 
+import ejb.FormularioDigitadorLocal;
 import ejb.FormularioEJBLocal;
 import ejb.UsuarioEJBLocal;
+import entity.EdicionFormulario;
 import entity.Formulario;
+import entity.FormularioEvidencia;
 import entity.Traslado;
 import entity.Usuario;
 import java.util.ArrayList;
@@ -36,15 +39,21 @@ public class TodoMB {
     @EJB
     private UsuarioEJBLocal usuarioEJB;
 
-    @EJB
-    private FormularioEJBLocal formularioEJB;
+   @EJB
+    private FormularioDigitadorLocal formularioDigitador;
 
+   @EJB
+    private FormularioEJBLocal formularioEJB;
+   
     private HttpServletRequest httpServletRequest;
     private FacesContext facesContext;
 
     private HttpServletRequest httpServletRequest1;
     private FacesContext facesContext1;
-    
+
+    private HttpServletRequest httpServletRequest2;
+    private FacesContext facesContext2;
+
     private String usuarioEntrega;
     private String usuarioEntregaUnidad;
     private String usuarioEntregaCargo;
@@ -59,19 +68,31 @@ public class TodoMB {
 
     private String usuarioSis;
     private Usuario usuarioSesion;
-    
+
     private int nue;
 
+    private String rutInicia;
+    private Usuario usuarioInicia;
     private Formulario formulario;
 
+    private List<FormularioEvidencia> evidenciasList;
+    private String evidencia;
+    
     private List<Traslado> trasladosList;
     
+    private boolean bloqueada;
+    
+    private int contador = 1;
+    private String cambia;
+    private List<Traslado> intercalado;
+
     static final Logger logger = Logger.getLogger(TodoMB.class.getName());
 
     public TodoMB() {
         logger.setLevel(Level.ALL);
         logger.entering(this.getClass().getName(), "TodoMB");
         this.trasladosList = new ArrayList<>();
+
         facesContext = FacesContext.getCurrentInstance();
         httpServletRequest = (HttpServletRequest) facesContext.getExternalContext().getRequest();
         if (httpServletRequest.getSession().getAttribute("nueF") != null) {
@@ -84,9 +105,19 @@ public class TodoMB {
             this.usuarioSis = (String) httpServletRequest1.getSession().getAttribute("cuentaUsuario");
             logger.log(Level.FINEST, "Usuario recibido {0}", this.usuarioSis);
         }
+
+        facesContext2 = FacesContext.getCurrentInstance();
+        httpServletRequest2 = (HttpServletRequest) facesContext2.getExternalContext().getRequest();
+        if (httpServletRequest2.getSession().getAttribute("rutInicia") != null) {
+            this.rutInicia = (String) httpServletRequest2.getSession().getAttribute("rutInicia");
+            logger.log(Level.FINEST, "RutInicia recibido {0}", this.rutInicia);
+        }
+        this.evidenciasList = new ArrayList();
+        this.usuarioInicia = new Usuario();
+        this.usuarioSesion = new Usuario();
         logger.exiting(this.getClass().getName(), "TodoMB");
     }
-    
+
     @PostConstruct
     public void cargarDatos() {
         logger.setLevel(Level.ALL);
@@ -94,29 +125,21 @@ public class TodoMB {
         this.usuarioSesion = usuarioEJB.findUsuarioSesionByCuenta(usuarioSis);
         this.formulario = formularioEJB.findFormularioByNue(this.nue);
         this.trasladosList = formularioEJB.traslados(this.formulario);
-        logger.log(Level.INFO, "formulario ruc {0}", this.formulario.getRuc());
-        logger.log(Level.FINEST, "todos cant traslados {0}", this.trasladosList.size());
+        this.usuarioInicia = usuarioEJB.findUserByRut(rutInicia);
+                
+        this.evidenciasList = formularioEJB.findEvidenciaFormularioByFormulario(formulario);
+        if (!evidenciasList.isEmpty()) {
+            this.evidencia = evidenciasList.get(0).getEvidenciaidEvidencia().getNombreEvidencia();
+        }
+        
+        intercalado = new ArrayList<>();
+         intercalado(trasladosList);
+        
+        this.bloqueada = formulario.getBloqueado();
         logger.exiting(this.getClass().getName(), "cargarDatosDigitador");
     }
 
-   /*public String agregarTraslado() {
-        logger.setLevel(Level.ALL);
-        logger.entering(this.getClass().getName(), "agregarTrasladoDigitador");
-        logger.log(Level.FINEST, "rut usuario entrega {0}", this.usuarioEntrega);
-        logger.log(Level.FINEST, "rut usuario recibe {0}", this.usuarioRecibe);
-        logger.log(Level.FINEST, "rut motivo {0}", this.motivo);
-        String resultado = formularioEJB.crearTraslado(formulario, usuarioEntrega, usuarioEntregaUnidad, usuarioEntregaCargo, usuarioEntregaRut, usuarioRecibe, usuarioRecibeUnidad, usuarioRecibeCargo, usuarioRecibeRut, fechaT, observacionesT, motivo, usuarioSesion);
-        if (resultado.equals("Exito")) {
-            httpServletRequest.getSession().setAttribute("nueF", this.nue);
-            logger.exiting(this.getClass().getName(), "agregarTrasladoPerito", "todoHU11?faces-redirect=true");
-            return "todoHU11?faces-redirect=true";
-        }
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, resultado, "Uno o más datos inválidos"));
-        logger.exiting(this.getClass().getName(), "agregarTrasladoDigitador", "");
-        return "";
-    }*/
-   
-   public String salir() {
+    public String salir() {
         logger.setLevel(Level.ALL);
         logger.entering(this.getClass().getName(), "salirDigitador");
         logger.log(Level.FINEST, "usuario saliente {0}", this.usuarioSesion.getNombreUsuario());
@@ -124,7 +147,124 @@ public class TodoMB {
         logger.exiting(this.getClass().getName(), "salirDigitador", "/indexListo");
         return "/indexListo?faces-redirect=true";
     }
+    
+    //redirecciona a la pagina para iniciar cadena de custodia
+    public String nuevaCadena(){
+        logger.entering(this.getClass().getName(), "iniciarCadena");
+        httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.usuarioSis);        
+        logger.exiting(this.getClass().getName(), "iniciarCadena", "digitadorFormularioHU11");
+        return "digitadorFormularioHU11?faces-redirect=true";
+    }
+    
+     public String agregarTraslado() {
+        logger.setLevel(Level.ALL);
+        logger.entering(this.getClass().getName(), "agregarTrasladoDigitador");
+        logger.log(Level.FINEST, "rut usuario entrega {0}", this.usuarioEntrega);
+        logger.log(Level.FINEST, "rut usuario recibe {0}", this.usuarioRecibe);
+        logger.log(Level.FINEST, "rut motivo {0}", this.motivo);
+        String resultado = formularioDigitador.crearTraslado(formulario, usuarioInicia, usuarioRecibe, usuarioRecibeCargo, usuarioRecibeRut, fechaT, observacionesT, motivo, usuarioSesion);
+        if (resultado.equals("Exito")) {
+            httpServletRequest.getSession().setAttribute("nueF", this.nue);
+            httpServletRequest.getSession().setAttribute("cuentaUsuario", this.usuarioSis);
+            httpServletRequest.getSession().setAttribute("rutInicia", this.rutInicia);
+            logger.exiting(this.getClass().getName(), "agregarTrasladoDigitador", "todoHU11?faces-redirect=true");
+            return "todoHU11?faces-redirect=true";
+        }
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, resultado, "Uno o más datos inválidos"));
+        logger.exiting(this.getClass().getName(), "agregarTrasladoDigitador", "");
+        return "";
+    }
+    
+    public String cambio() {
 
+        if (contador == 1) {
+            cambia = "Entrega";
+            contador++;
+        } else if (contador == 2) {
+            cambia = "Recibe";
+            contador++;
+        } else {
+            contador = 2;
+            cambia = "Entrega";
+        }
+
+        return cambia;
+    }
+
+    private void intercalado(List<Traslado> traslados) {
+
+        for (int i = 0; i < traslados.size(); i++) {
+
+            for (int j = 0; j < 2; j++) {
+                Traslado tras = new Traslado();
+                tras.setFechaEntrega(traslados.get(i).getFechaEntrega());
+                tras.setFormularioNUE(traslados.get(i).getFormularioNUE());
+                tras.setObservaciones(traslados.get(i).getObservaciones());
+                tras.setTipoMotivoidMotivo(traslados.get(i).getTipoMotivoidMotivo());
+
+                if (j == 0) {
+                    tras.setUsuarioidUsuarioEntrega(traslados.get(i).getUsuarioidUsuarioEntrega());
+
+                } else {
+                    tras.setUsuarioidUsuarioEntrega(traslados.get(i).getUsuarioidUsuarioRecibe());
+
+                }
+                intercalado.add(tras);
+
+            }
+
+        }
+        System.out.println(intercalado.toString());
+    }
+
+    public Usuario getUsuarioInicia() {
+        return usuarioInicia;
+    }
+
+    public void setUsuarioInicia(Usuario usuarioInicia) {
+        this.usuarioInicia = usuarioInicia;
+    }
+
+    public List<FormularioEvidencia> getEvidenciasList() {
+        return evidenciasList;
+    }
+
+    public void setEvidenciasList(List<FormularioEvidencia> evidenciasList) {
+        this.evidenciasList = evidenciasList;
+    }
+
+    public String getEvidencia() {
+        return evidencia;
+    }
+
+    public void setEvidencia(String evidencia) {
+        this.evidencia = evidencia;
+    }
+
+    public boolean isBloqueada() {
+        return bloqueada;
+    }
+
+    public void setBloqueada(boolean bloqueada) {
+        this.bloqueada = bloqueada;
+    }
+
+    public String getCambia() {
+        return cambia;
+    }
+
+    public void setCambia(String cambia) {
+        this.cambia = cambia;
+    }
+
+    public List<Traslado> getIntercalado() {
+        return intercalado;
+    }
+
+    public void setIntercalado(List<Traslado> intercalado) {
+        this.intercalado = intercalado;
+    }
+    
     public String getUsuarioEntrega() {
         return usuarioEntrega;
     }
@@ -252,10 +392,5 @@ public class TodoMB {
     public void setTrasladosList(List<Traslado> trasladosList) {
         this.trasladosList = trasladosList;
     }
-    
-
-    
-
-
 
 }

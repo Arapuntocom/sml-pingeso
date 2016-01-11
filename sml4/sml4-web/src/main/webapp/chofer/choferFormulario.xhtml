@@ -176,15 +176,21 @@
                                         <br />
 
                                         <h:outputLabel for="evidencias" value="Evidencias:" />
-                                        
+
+
+
                                         <h:selectOneMenu id="evidencias" value="#{crearFormularioChoferMB.evidencias}">    
                                             <f:selectItem itemValue="0" itemLabel="Seleccione" noSelectionOption="true"/>
                                             <f:selectItems value="#{crearFormularioChoferMB.listEvidenciasx}" var="evid" itemLabel="#{evid}" itemValue="#{evid}"/>                                           
                                         </h:selectOneMenu>
 
+                                        <h:commandButton value="Agregar">
+                                            <f:ajax render="@form" execute="@form" listener="#{crearFormularioChoferMB.addEvidencia()}" />
+                                        </h:commandButton>
+
                                         <br />
                                     </h:panelGrid>
-                                    
+
                                     <!-- evidencia -->
 
 

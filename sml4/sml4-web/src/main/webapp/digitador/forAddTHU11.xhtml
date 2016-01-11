@@ -31,7 +31,7 @@
 
             <h:form>
                 <div class="thumbnail">
-                    <div align="center"><h:outputLabel class="input-group-lg"  for="NombreUsuario" style=" background-color: white" value="Bienvenido(a) #{crearFormularioMB.usuarioSesion.nombreUsuario}"></h:outputLabel></div>
+                    <div align="center"><h:outputLabel class="input-group-lg"  for="NombreUsuario" style=" background-color: white" value="Bienvenido(a) #{forTrasladoMB.usuarioSesion.nombreUsuario} #{forTrasladoMB.usuarioSesion.apellidoUsuario}"></h:outputLabel></div>
                 </div>
             </h:form> 
 
@@ -45,11 +45,9 @@
                 <div class="col-md-9"> <!-- Barra de navegación -->
                     <h:form>
                         <ul class="nav nav-tabs nav-justified">
-
                             <li role="presentation" class="active"><a href="#">Cadena de Custodia</a></li>
-
-                            <li role="presentation"> <h:commandLink id="cs" action="#{forTrasladoMB.salir()}" value="Cerrar sesión"></h:commandLink> </li>
-
+                            <li role="presentation"><a href="digitadorFormularioHU11.xhtml">Nueva Cadena de Custodia</a></li>                        
+                            <li role="presentation"> <h:commandLink id="cs" action="#{forTrasladoMB.salir()}" value="Cerrar sesión"></h:commandLink> </li>                    
                         </ul>
                     </h:form>
                 </div>
@@ -93,15 +91,13 @@
                                     <p:inputText id="rit" value="#{forTrasladoMB.formulario.rit}" label="rit" disabled="true"></p:inputText>
 
                                     <h:outputLabel  for="nue" value="N.U.E.:" style="width:120px"></h:outputLabel>
-                                    <p:inputText id="nue" value="#{forTrasladoMB.formulario.nue}" label="nue" disabled="true">
-                                        <f:validateDoubleRange minimum="10000" maximum="99999"/>
-                                    </p:inputText>                                   
+                                    <p:inputText id="nue" value="#{forTrasladoMB.formulario.nue}" label="nue" disabled="true"></p:inputText>                                   
 
                                     <h:outputLabel  for="del" value="Delito:" style="width:120px"></h:outputLabel>
                                     <p:inputText id="del" value="#{forTrasladoMB.formulario.delitoRef}" label="Delito" disabled="true"></p:inputText>
 
                                     <h:outputLabel for="car" value="Cargo:" style="width: 120px"/>
-                                    <p:inputText id="car" value="#{forTrasladoMB.formulario.usuarioidUsuario1.cargoidCargo.nombreCargo}" label="Cargo" disabled="true"/>
+                                    <p:inputText id="car" value="#{forTrasladoMB.formulario.usuarioidUsuarioInicia.cargoidCargo.nombreCargo}" label="Cargo" disabled="true"/>
 
                                     <h:outputLabel  for="dir" value="Dirección:" style="width:120px"></h:outputLabel>
                                     <p:inputText id="dir" value="#{forTrasladoMB.formulario.direccionSS}" label="Dirección" disabled="true"></p:inputText>
@@ -112,14 +108,14 @@
                                     <h:outputLabel  for="parte" value="N° Parte:" style="width:120px"></h:outputLabel>
                                     <p:inputText id="parte" value="#{forTrasladoMB.formulario.numeroParte}" label="N° Parte" disabled="true"></p:inputText>
 
-                                    <h:outputLabel  for="uni" value="Unidad:" style="width:120px"></h:outputLabel>
-                                    <p:inputText id="uni" value="#{forTrasladoMB.formulario.usuarioidUsuario1.unidad}" label="Unidad" disabled="true"></p:inputText>
+                                    <h:outputLabel  for="uni" value="Unidad Policial:" style="width:120px"></h:outputLabel>
+                                    <p:inputText id="uni" value="#{forTrasladoMB.formulario.unidadPolicial}" label="Unidad" disabled="true"></p:inputText>
 
                                     <h:outputLabel  for="lev" value="Levantada por:" style="width:120px"></h:outputLabel>
-                                    <p:inputText id="lev" value="#{forTrasladoMB.formulario.usuarioidUsuario1.nombreUsuario}" label="Levantada por" disabled="true"></p:inputText>
+                                    <p:inputText id="lev" value="#{forTrasladoMB.formulario.usuarioidUsuarioInicia.nombreUsuario} #{forTrasladoMB.formulario.usuarioidUsuarioInicia.apellidoUsuario}" label="Levantada por" disabled="true"></p:inputText>
 
                                     <h:outputLabel  for="run" value="R.U.N.:" style="width:120px"></h:outputLabel>
-                                    <p:inputText id="run" value="#{forTrasladoMB.formulario.usuarioidUsuario1.rutUsuario}" label="R.U.N." disabled="true"></p:inputText>            
+                                    <p:inputText id="run" value="#{forTrasladoMB.formulario.usuarioidUsuarioInicia.rutUsuario}" label="R.U.N." disabled="true"></p:inputText>            
 
                                 </h:panelGrid> <br />
 
@@ -130,6 +126,10 @@
                                     <hr />
                                     <h:outputLabel  for="obs" value="Observaciones:" style="width:120px"></h:outputLabel>
                                     <p:inputTextarea id="Observaciones" rows="3" cols="90" value="#{forTrasladoMB.formulario.observaciones}" queryDelay="750" minQueryLength="4" disabled="true" />
+
+
+                                    <h:outputLabel for="evi" value="Evidencia:" style="width:120px"/>
+                                    <p:inputText id="evi" value="#{forTrasladoMB.evidencia}" label="Evidencia" disabled="true"></p:inputText>    
 
                                     <h:outputLabel  for="des" value="Descripción:" style="width:120px"></h:outputLabel>
                                     <p:inputTextarea id="descripcion" rows="3" cols="90" value="#{forTrasladoMB.formulario.descripcionEspecieFormulario}" disabled="true" queryDelay="750" minQueryLength="4" />
@@ -149,36 +149,32 @@
 
                                 <h:panelGrid columns="5" cellpadding="5" class="ui-grid">
 
-                                    <h:outputLabel  style="width:120px" for="UnE" value="Unidad:"></h:outputLabel> <!-- nose si poner la misma etiqueta -->
-                                    <p:inputText id="UnE" value="#{forTrasladoMB.usuarioEntregaUnidad}" label="Unidad" required="true" requiredMessage="Debe ingresar la unidad">
-                                    </p:inputText>
-                                    <p:message for="UnE" display="text"/> 
+
+                                    <h:outputLabel  for="area" value="Área:" style="width:120px"></h:outputLabel>
+                                    <p:inputText id="area" value="#{forTrasladoMB.usuarioInicia.areaidArea.nombreArea}" label="Área." disabled="true"></p:inputText>   
+
+
 
                                 </h:panelGrid>
                                 <h:panelGrid columns="5" cellpadding="5" class="ui-grid">
 
-                                    <h:outputLabel  style="width:120px" for="CE" value="Cargo:"></h:outputLabel> <!-- nose si poner la misma etiqueta -->
-                                    <p:inputText id="CE" value="#{forTrasladoMB.usuarioEntregaCargo}" label="Cargo" required="true" requiredMessage="Debe ingresar la unidad">
-                                    </p:inputText>
-                                    <p:message for="CE" display="text"/> 
+                                    <h:outputLabel  for="cargo" value="Cargo:" style="width:120px"></h:outputLabel>
+                                    <p:inputText id="cargo" value="#{forTrasladoMB.usuarioInicia.cargoidCargo.nombreCargo}" label="Cargo" disabled="true"></p:inputText>
 
-                                </h:panelGrid>
-
-                                <h:panelGrid columns="5" cellpadding="5" class="ui-grid">
-
-                                    <h:outputLabel  style="width:120px" for="nomE" value="Nombre:"></h:outputLabel>
-                                    <p:inputText id="nomE" value="#{forTrasladoMB.usuarioEntrega}" label="Nombre" required="true" requiredMessage="Debe ingresar el nombre">
-                                    </p:inputText>
-                                    <p:message for="nomE" display="text"/> 
 
                                 </h:panelGrid>
 
                                 <h:panelGrid columns="5" cellpadding="5" class="ui-grid">
 
-                                    <h:outputLabel  style="width:120px" for="runE" value="R.U.N.:"></h:outputLabel>
-                                    <p:inputText id="runE" value="#{forTrasladoMB.usuarioEntregaRut}" label="R.U.N." required="true" requiredMessage="Debe Ingresar el R.U.N.">
-                                    </p:inputText>
-                                    <p:message for="runE" display="text"/> 
+                                    <h:outputLabel  for="nombre" value="Nombre:" style="width:120px"></h:outputLabel>
+                                    <p:inputText id="nombre" value="#{forTrasladoMB.usuarioInicia.nombreUsuario} #{forTrasladoMB.usuarioInicia.apellidoUsuario}" label="nombre" disabled="true"></p:inputText>
+
+                                </h:panelGrid>
+
+                                <h:panelGrid columns="5" cellpadding="5" class="ui-grid">
+
+                                    <h:outputLabel  for="rut" value="R.U.T:" style="width:120px"></h:outputLabel>
+                                    <p:inputText id="rut" value="#{forTrasladoMB.usuarioInicia.rutUsuario}" label="rut" disabled="true"></p:inputText>
 
                                 </h:panelGrid>
                                 <br />

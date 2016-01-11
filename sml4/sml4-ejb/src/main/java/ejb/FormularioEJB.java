@@ -152,8 +152,6 @@ public class FormularioEJB implements FormularioEJBLocal {
         logger.setLevel(Level.ALL);
         logger.entering(this.getClass().getName(), "crearTraslado");
 
-        System.out.println("MOTIVO ->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " + motivoNext);
-
         if (formulario == null) {
             logger.exiting(this.getClass().getName(), "crearTraslado", "Formulario nulo");
             return "Imposible agregar traslado, ocurrió un problema al cargar el formulario, por favor intente más tarde.";
@@ -511,7 +509,11 @@ public class FormularioEJB implements FormularioEJBLocal {
         }
 
         TipoEvidencia tipoEvid = tipoEvidenciaFacade.findByNombreAndTipoEvidencia(nombreTipoEvid, areaEvid);
-
+         if(tipoEvid == null){
+            logger.exiting(this.getClass().getName(), "crearFormulario", "problema al cargar el tipo de evidencia");
+            return "Ocurrió un problema al cargar el tipo de evidencia.";
+        }
+        
         Evidencia evidenciaP = evidenciaFacade.findByNombreAndTipoEvidencia(evidencia, tipoEvid);
         if (evidenciaP == null) {
             logger.exiting(this.getClass().getName(), "crearFormulario", "problema al cargar la evidencia");

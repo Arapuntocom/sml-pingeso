@@ -31,7 +31,7 @@
 
             <h:form>
                 <div class="thumbnail">
-                    <div align="center"><h:outputLabel class="input-group-lg"  for="NombreUsuario" style=" background-color: white" value="Bienvenido(a) #{crearFormularioMB.usuarioSesion.nombreUsuario}"></h:outputLabel></div>
+                    <div align="center"><h:outputLabel class="input-group-lg"  for="NombreUsuario" style=" background-color: white" value="Bienvenido(a) #{todoMB.usuarioSesion.nombreUsuario} #{todoMB.usuarioSesion.apellidoUsuario}"></h:outputLabel></div>
                 </div>
             </h:form> 
 
@@ -45,12 +45,9 @@
                 <div class="col-md-9"> <!-- Barra de navegación -->
                     <h:form>
                         <ul class="nav nav-tabs nav-justified">
-
                             <li role="presentation" class="active"><a href="#">Cadena de Custodia</a></li>
-                            <li role="presentation"><a href="digitadorFormularioHU11.xhtml">Nueva Cadena de custodia</a></li>                        
-                            <li role="presentation"> <h:commandLink id="cs" action="#{todoChoferMB.salir()}" value="Cerrar sesión"></h:commandLink> </li>                    
-
-                        </ul>
+                            <li role="presentation"><a href="digitadorFormularioHU11.xhtml">Nueva Cadena de Custodia</a></li>                        
+                            <li role="presentation"> <h:commandLink id="cs" action="#{todoMB.salir()}" value="Cerrar sesión"></h:commandLink> </li>                                </ul>
                     </h:form>
                 </div>
             </div>      
@@ -81,6 +78,7 @@
                     <!--fin usuario logeado --> 
                     <div class="col-md-9">
                         <div class="thumbnail" style="width: 785px; padding: 15px;">
+                             <h4 style="text-align: center;" >Formulario Único de cadena de custodia</h4><hr />
                             <!-- Barra de navegación -->
                             <h:form>
                                 <h:panelGrid columns="4" cellpadding="5" class="ui-grid">
@@ -91,9 +89,7 @@
                                     <p:inputText id="rit" value="#{todoMB.formulario.rit}" label="rit" disabled="true"></p:inputText>
 
                                     <h:outputLabel  for="nue" value="N.U.E.:" style="width:120px"></h:outputLabel>
-                                    <p:inputText id="nue" value="#{todoMB.formulario.nue}" label="nue" disabled="true">
-                                        <f:validateDoubleRange minimum="10000" maximum="99999"/>
-                                    </p:inputText>                                   
+                                    <p:inputText id="nue" value="#{todoMB.formulario.nue}" label="nue" disabled="true"></p:inputText>                                   
 
                                     <h:outputLabel  for="del" value="Delito:" style="width:120px"></h:outputLabel>
                                     <p:inputText id="del" value="#{todoMB.formulario.delitoRef}" label="Delito" disabled="true"></p:inputText>
@@ -107,11 +103,11 @@
                                     <h:outputLabel  for="parte" value="N° Parte:" style="width:120px"></h:outputLabel>
                                     <p:inputText id="parte" value="#{todoMB.formulario.numeroParte}" label="N° Parte" disabled="true"></p:inputText>
 
-                                    <h:outputLabel  for="uni" value="Unidad:" style="width:120px"></h:outputLabel>
-                                    <p:inputText id="uni" value="#{todoMB.formulario.usuarioidUsuario.unidad}" label="Unidad" disabled="true"></p:inputText>
+                                    <h:outputLabel  for="uni" value="Unidad Policial:" style="width:120px"></h:outputLabel>
+                                    <p:inputText id="uni" value="#{todoMB.formulario.unidadPolicial}" label="Unidad" disabled="true"></p:inputText>
 
                                     <h:outputLabel  for="lev" value="Levantada por:" style="width:120px"></h:outputLabel>
-                                    <p:inputText id="lev" value="#{todoMB.formulario.usuarioidUsuario.nombreUsuario}" label="Levantada por" disabled="true"></p:inputText>
+                                    <p:inputText id="lev" value="#{todoMB.formulario.usuarioidUsuario.nombreUsuario} #{todoMB.formulario.usuarioidUsuario.apellidoUsuario}" label="Levantada por" disabled="true"></p:inputText>
 
                                     <h:outputLabel  for="run" value="R.U.N.:" style="width:120px"></h:outputLabel>
                                     <p:inputText id="run" value="#{todoMB.formulario.usuarioidUsuario.rutUsuario}" label="R.U.N." disabled="true"></p:inputText>            
@@ -126,68 +122,96 @@
                                     <h:outputLabel  for="obs" value="Observaciones:" style="width:120px"></h:outputLabel>
                                     <p:inputTextarea id="Observaciones" rows="3" cols="90" value="#{todoMB.formulario.observaciones}" queryDelay="750" minQueryLength="4" disabled="true" />
 
+                                    <h:outputLabel for="evi" value="Evidencia:" style="width:120px"/>
+                                    <p:inputText id="evi" value="#{todoMB.evidencia}" label="Evidencia" disabled="true"></p:inputText>    
+
                                     <h:outputLabel  for="des" value="Descripción:" style="width:120px"></h:outputLabel>
                                     <p:inputTextarea id="descripcion" rows="3" cols="90" value="#{todoMB.formulario.descripcionEspecieFormulario}" queryDelay="750" minQueryLength="4" disabled="true" />
                                 </h:panelGrid>   
 
-                                <!-- traslado  -->
-                                <h4 class="pull-center">Cadena de Custodia</h4><br />
+                                
+                                <h4> Mostrando Traslados</h4>
+                                <div align="center">
 
+                                    <p:dataTable var="traslado" value="#{todoMB.intercalado}" emptyMessage="No se han registrado más participantes en esta cadena de custodia." scrollRows="20" scrollable="true" liveScroll="true" scrollHeight="150" style="margin-bottom:0">
+
+                                        <p:column headerText="">
+                                            <h:outputText value="#{todoMB.cambio()}"/>
+                                        </p:column>
+
+                                        <p:column headerText="Nombre">
+                                            <h:outputText value="#{traslado.usuarioidUsuarioEntrega.nombreUsuario} #{traslado.usuarioidUsuarioEntrega.apellidoUsuario}" />
+                                        </p:column>
+
+                                        <p:column headerText="Cargo">
+                                            <h:outputText value="#{traslado.usuarioidUsuarioEntrega.cargoidCargo.nombreCargo}" />
+                                        </p:column>
+
+                                        <p:column headerText="R.U.N.">
+                                            <h:outputText value="#{traslado.usuarioidUsuarioEntrega.rutUsuario}" />
+                                        </p:column>
+
+                                        <p:column headerText="Fecha" rowspan="2">
+                                            <h:outputText value="#{traslado.fechaEntrega}" />
+                                        </p:column>
+
+                                        <p:column headerText="Observación" rowspan="2">
+                                            <h:outputText value="#{traslado.observaciones}" />
+                                        </p:column>
+
+                                        <p:column headerText="Motivo" rowspan="2">
+                                            <h:outputText value="#{traslado.tipoMotivoidMotivo.tipoMotivo}" />
+                                        </p:column>
+                                    </p:dataTable>
+                                </div><br />
+                                
+                                
+                                
+                                
+                                <!-- traslado  -->
+                               <h4 class="pull-center">Siguiente Traslado</h4><br />
                                 <h:panelGrid columns="5" cellpadding="5" class="ui-grid">
                                     <h:outputLabel  style="width:120px" for="fech" value="Fecha:"></h:outputLabel> <!-- nose si poner la misma etiqueta -->
-                                    <p:calendar id="fech" pattern="dd/MM/yyyy HH:mm" locale="es" value="#{todoMB.fechaT}" required="true" requiredMessage="Debe ingresar la fecha"/>
+                                    <p:calendar id="fech" pattern="dd/MM/yyyy HH:mm" locale="es" value="#{todoMB.fechaT}" required="true" requiredMessage="Debe ingresar la fecha"/>                                    
                                     <p:message for="fech" display="text"/>
                                 </h:panelGrid>
+
                                 <br />
+
                                 <h4 class="pull-center">Entrega:</h4> <br />
-
                                 <h:panelGrid columns="5" cellpadding="5" class="ui-grid">
-
-                                    <h:outputLabel  style="width:120px" for="UnE" value="Unidad:"></h:outputLabel> <!-- nose si poner la misma etiqueta -->
-                                    <p:inputText id="UnE" value="#{todoMB.usuarioEntregaUnidad}" label="Unidad" required="true" requiredMessage="Debe ingresar la unidad"></p:inputText> <!-- nose si poner la misma etiqueta -->
-                                    <p:message for="UnE" display="text"/>
+                                    <h:outputLabel  for="area" value="Área:" style="width:120px"></h:outputLabel>
+                                    <p:inputText id="area" value="#{todoMB.usuarioInicia.areaidArea.nombreArea}" label="Área." disabled="true"></p:inputText>   
                                 </h:panelGrid>
-
-
                                 <h:panelGrid columns="5" cellpadding="5" class="ui-grid">
-
-                                    <h:outputLabel  style="width:120px" for="CE" value="Cargo:"></h:outputLabel> <!-- nose si poner la misma etiqueta -->
-                                    <p:inputText id="CE" value="#{todoMB.usuarioEntregaCargo}" label="Cargo" required="true" requiredMessage="Debe ingresar el cargo">
-                                    </p:inputText>
-                                    <p:message for="CE" display="text"/> 
-
+                                    <h:outputLabel  for="cargo" value="Cargo:" style="width:120px"></h:outputLabel>
+                                    <p:inputText id="cargo" value="#{todoMB.usuarioInicia.cargoidCargo.nombreCargo}" label="Cargo" disabled="true"></p:inputText>
                                 </h:panelGrid>
 
                                 <h:panelGrid columns="5" cellpadding="5" class="ui-grid">
-
-                                    <h:outputLabel  style="width:120px" for="nomE" value="Nombre:"></h:outputLabel>
-                                    <p:inputText id="nomE" value="#{todoMB.usuarioEntrega}" label="Nombre" required="true" requiredMessage="Debe Ingresar el nombre"></p:inputText>
-                                    <p:message for="nomE" display="text"/>
+                                    <h:outputLabel  for="nombre" value="Nombre:" style="width:120px"></h:outputLabel>
+                                    <p:inputText id="nombre" value="#{todoMB.usuarioInicia.nombreUsuario} #{todoMB.usuarioInicia.apellidoUsuario}" label="nombre" disabled="true"></p:inputText>
                                 </h:panelGrid>
 
                                 <h:panelGrid columns="5" cellpadding="5" class="ui-grid">
-
-                                    <h:outputLabel  style="width:120px" for="runE" value="R.U.N.:"></h:outputLabel>
-                                    <p:inputText id="runE" value="#{todoMB.usuarioEntregaRut}" label="R.U.N." required="true" requiredMessage="Debe ingresar el R.U.N."></p:inputText>
-                                    <p:message for="runE" display="text"/>
+                                    <h:outputLabel  for="rut" value="R.U.T:" style="width:120px"></h:outputLabel>
+                                    <p:inputText id="rut" value="#{todoMB.usuarioInicia.rutUsuario}" label="rut" disabled="true"></p:inputText>
                                 </h:panelGrid>
+
                                 <br />
-                                <h4 class="pull-center">Recibe:</h4><br />
 
+                                <h4 class="pull-center">Recibe:</h4><br />
                                 <h:panelGrid columns="5" cellpadding="5" class="ui-grid">
                                     <h:outputLabel  style="width:120px" for="UnR" value="Unidad:"></h:outputLabel> <!-- nose si poner la misma etiqueta -->
                                     <p:inputText id="UnR" value="#{todoMB.usuarioRecibeUnidad}" label="Unidad" required="true" requiredMessage="Debe ingresar la unidad"></p:inputText> <!-- nose si poner la misma etiqueta -->
                                     <p:message for="UnR" display="text"/>
                                 </h:panelGrid>
 
-
                                 <h:panelGrid columns="5" cellpadding="5" class="ui-grid">
-
                                     <h:outputLabel  style="width:120px" for="CR" value="Cargo:"></h:outputLabel> <!-- nose si poner la misma etiqueta -->
                                     <p:inputText id="CR" value="#{todoMB.usuarioRecibeCargo}" label="Cargo" required="true" requiredMessage="Debe ingresar la cargo">
                                     </p:inputText>
                                     <p:message for="CR" display="text"/> 
-
                                 </h:panelGrid>
 
                                 <h:panelGrid columns="5" cellpadding="5" class="ui-grid">
@@ -197,58 +221,32 @@
                                 </h:panelGrid>
 
                                 <h:panelGrid columns="5" cellpadding="5" class="ui-grid">
-
                                     <h:outputLabel  style="width:120px" for="runR" value="R.U.N.:"></h:outputLabel>
                                     <p:inputText id="runR" value="#{todoMB.usuarioRecibeRut}" label="R.U.N." required="true" requiredMessage="Debe ingresar el R.U.N."></p:inputText>
                                     <p:message for="runR" display="text"/>
                                 </h:panelGrid>
+
                                 <br />
+
                                 <div align="center">
                                     <h:selectOneRadio id="mot" value="#{todoMB.motivo}" required="true" requiredMessage="Debe ingresar el motivo">
-                                        <f:selectItem itemValue="Peritaje" itemLabel="Peritaje" /> <!-- agregar libreria arriba-->
+                                        <f:selectItem itemValue="Peritaje" itemLabel="Peritaje" /> 
                                         <f:selectItem itemValue="Traslado" itemLabel="Traslado" />
                                         <f:selectItem itemValue="Custodia" itemLabel="Custodia" />
                                     </h:selectOneRadio><br />
                                     <p:message for="mot" display="text"/>
                                 </div><br />
 
-
-
                                 <h:outputLabel  for="obsCC" value="Observaciones:" style="width:120px"></h:outputLabel>
                                 <p:inputTextarea id="ObsCC" rows="3" cols="90" value="#{todoMB.observacionesT}" queryDelay="750" minQueryLength="4" />
                                 <br />    
                                 <h:commandButton id="btnAceptar" value="Aceptar" action="#{todoMB.agregarTraslado()}"/>
-
+                                <p:spacer width="20" height="20" />
+                                 <h:commandButton value="Iniciar Cadena de Custodia" label="" action = "#{todoMB.nuevaCadena()}" ></h:commandButton>   
                                 <br />
 
-                            </h:form> <br />
-                           <h4> Mostrando Traslados</h4>
-                           <p:dataList value="#{todoMB.trasladosList}" var="traslado" emptyMessage="No se han registrado más participantes en esta cadena de custodia." style="width:785px;">     
-                                        <h:outputLabel value="Fecha: " for="feT" />&nbsp;
-                                        <h:outputText id="feT" value="#{traslado.fechaEntrega} "/>&nbsp;&nbsp;&nbsp;
-                                        
-                                        <h:outputLabel value="Motivo: " for="moT"/>&nbsp;
-                                        <h:outputText id="moT" value="#{traslado.tipoMotivoidMotivo.tipoMotivo}"/>&nbsp;&nbsp;&nbsp;
-                                        <h4>Entrega: </h4>
-                                        <h:outputLabel value="Nombre: " for="nomTE" />&nbsp;
-                                        <h:outputText id="nomTE" value="#{traslado.usuarioidUsuario1.nombreUsuario}" />&nbsp;&nbsp;&nbsp;
-                                        <h:outputLabel value="Cargo: " for="carTE" />&nbsp;
-                                        <h:outputText id="carTE" value="#{traslado.usuarioidUsuario1.cargoidCargo.nombreCargo}" />&nbsp;&nbsp;&nbsp;
-                                        <h:outputLabel value="R.U.N.:"  for="ruTE" />&nbsp;
-                                        <h:outputText id="ruTE" value="#{traslado.usuarioidUsuario1.rutUsuario}" />    &nbsp;   &nbsp;&nbsp;
-                                        <h4>Recibe: </h4>
-                                        <h:outputLabel value="Nombre: " for="nomTR" />&nbsp;
-                                        <h:outputText id="nomTR" value="#{traslado.usuarioidUsuario.nombreUsuario}" />&nbsp;&nbsp;&nbsp;
-                                        <h:outputLabel value="Cargo: " for="carTR" />&nbsp;
-                                        <h:outputText id="carTR" value="#{traslado.usuarioidUsuario.cargoidCargo.nombreCargo}" />&nbsp;&nbsp;&nbsp;
-                                        <h:outputLabel value="R.U.N.: " for="ruTR" />&nbsp;
-                                        <h:outputText id="ruTR" value="#{traslado.usuarioidUsuario.rutUsuario}" /> <br/>&nbsp;&nbsp;&nbsp;
-                                        <h:outputLabel value="Observaciones: " for="obsTT" />&nbsp;
-                                        <h:outputText id="obsTT" value="#{traslado.observaciones}" />&nbsp;&nbsp;&nbsp;
-                                    </p:dataList>                                    
-                            <h:form>
-                                <h:commandButton id="btnvolver" value="Nueva Cadena de custodia" action="digitadorFormularioHU11.xhtml"/>
-                            </h:form> 
+
+                            </h:form>
                         </div>
                     </div>
 
