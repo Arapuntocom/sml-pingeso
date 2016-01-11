@@ -506,7 +506,7 @@ public class FormularioEJB implements FormularioEJBLocal {
         if (areaEvidencia == 5) {
             nombreTipoEvid = "Elemento balístico";
         }
-        if (areaEvidencia == 9) {
+        if (areaEvidencia == 4 || areaEvidencia == 9) {
             nombreTipoEvid = "Otros";
         }
 

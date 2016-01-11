@@ -77,98 +77,13 @@ public class CrearFormularioPeritoMB {
     private String depa;
     private List<String> listEvidencias = new ArrayList<>();
     private List<String> listEvidencias2 = new ArrayList<>();
-    private List<String> listEvidencias3 = new ArrayList<>();
+    private List<String> listEvidencias3c = new ArrayList<>();
+    private List<String> listEvidencias3t = new ArrayList<>();
     private List<String> listEvidencias4 = new ArrayList<>();
     private List<String> listEvidencias5 = new ArrayList<>();
     private List<String> listEvidencias6 = new ArrayList<>();
     private List<String> listEvidenciasx = new ArrayList<>();
  
-    public void iniciarListas() {
- 
-        listEvidencias.add("Contenido bucal");
-        listEvidencias.add("Contenido vaginal");
-        listEvidencias.add("Contenido rectal");
-        listEvidencias.add("Lecho ungeal");
-        listEvidencias.add("Secreciones");
-        listEvidencias.add("Sangre");
-        listEvidencias.add("Orina");
-        listEvidencias.add("Tejido cerebro");
-        listEvidencias.add("Tejido corazón");
-        listEvidencias.add("Tejido pulmón");
-        listEvidencias.add("Tejido hígado");
-        listEvidencias.add("Tejido baso");
-        listEvidencias.add("Tejido diafragma");
-        listEvidencias.add("Tejido intestino");
-        listEvidencias.add("Tejido piel");
-        listEvidencias.add("Tejido otros");
-        listEvidencias.add("Otros");
-        
-        listEvidencias6.add("Contenido bucal");
-        listEvidencias6.add("Contenido vaginal");
-        listEvidencias6.add("Contenido rectal");
-        listEvidencias6.add("Lecho ungeal");
-        listEvidencias6.add("Secreciones");
-        listEvidencias6.add("Sangre");
-        listEvidencias6.add("Orina");
-
-        listEvidencias.add("Otros");
- 
-        listEvidencias2.add("Vestido");
-        listEvidencias2.add("Blusa");
-        listEvidencias2.add("Camisa");
-        listEvidencias2.add("Pantalón");
-        listEvidencias2.add("Polera");
-        listEvidencias2.add("Chaqueta");
-        listEvidencias2.add("Chaleco");
-        listEvidencias2.add("Calzado");
-        listEvidencias2.add("Otros");
- 
-        listEvidencias3.add("Protector");
-        listEvidencias3.add("Toalla higiénica");
-        listEvidencias3.add("Otros");
- 
-        listEvidencias4.add("Arma blanca");
-        listEvidencias4.add("Cuchillo");
-        listEvidencias4.add("Sable");
-        listEvidencias4.add("Bala");
-        listEvidencias4.add("Otros");
-       
-        listEvidencias5.add("Otros");
-       
-        listEvidenciasx.add("Seleccione");
-        listEvidenciasx.add("Contenido bucal");
-        listEvidenciasx.add("Contenido vaginal");
-        listEvidenciasx.add("Contenido rectal");
-        listEvidenciasx.add("Lecho ungeal");
-        listEvidenciasx.add("Secreciones");
-        listEvidenciasx.add("Sangre");
-        listEvidenciasx.add("Orina");
-        listEvidenciasx.add("Tejido cerebro");
-        listEvidenciasx.add("Tejido corazón");
-        listEvidenciasx.add("Tejido pulmón");
-        listEvidenciasx.add("Tejido hígado");
-        listEvidenciasx.add("Tejido baso");
-        listEvidenciasx.add("Tejido diafragma");
-        listEvidenciasx.add("Tejido intestino");
-        listEvidenciasx.add("Tejido piel");
-        listEvidenciasx.add("Tejido otros");
-        listEvidenciasx.add("Vestido");
-        listEvidenciasx.add("Blusa");
-        listEvidenciasx.add("Camisa");
-        listEvidenciasx.add("Pantalón");
-        listEvidenciasx.add("Polera");
-        listEvidenciasx.add("Chaqueta");
-        listEvidenciasx.add("Chaleco");
-        listEvidenciasx.add("Calzado");
-        listEvidenciasx.add("Protector");
-        listEvidenciasx.add("Toalla higiénica");
-        listEvidenciasx.add("Arma blanca");
-        listEvidenciasx.add("Cuchillo");
-        listEvidenciasx.add("Sable");
-        listEvidenciasx.add("Bala");
-        listEvidenciasx.add("Otros");
-       
-    }
  
     public CrearFormularioPeritoMB() {        
         logger.setLevel(Level.ALL);
@@ -408,6 +323,102 @@ public class CrearFormularioPeritoMB {
         this.listEvidenciasx = listEvidenciasx;
     }
  
+        public void iniciarListas() {
+        //biologica tanato ok
+        listEvidencias.add("Contenido bucal");
+        listEvidencias.add("Contenido vaginal");
+        listEvidencias.add("Contenido rectal");
+        listEvidencias.add("Lecho ungeal");
+        listEvidencias.add("Secreciones");
+        listEvidencias.add("Sangre");
+        listEvidencias.add("Orina");
+        listEvidencias.add("Tejido cerebro");
+        listEvidencias.add("Tejido corazón");
+        listEvidencias.add("Tejido pulmón");
+        listEvidencias.add("Tejido hígado");
+        listEvidencias.add("Tejido baso");
+        listEvidencias.add("Tejido diafragma");
+        listEvidencias.add("Tejido intestino");
+        listEvidencias.add("Tejido piel");
+        listEvidencias.add("Tejido otros");
+        listEvidencias.add("Otros");
+
+        //biologica clinica ok
+        listEvidencias6.add("Contenido bucal");
+        listEvidencias6.add("Contenido vaginal");
+        listEvidencias6.add("Contenido rectal");
+        listEvidencias6.add("Lecho ungeal");
+        listEvidencias6.add("Secreciones");
+        listEvidencias6.add("Sangre");
+        listEvidencias6.add("Orina");        
+        listEvidencias6.add("Otros");
+
+     
+        //vestuario clinica y tanato ok
+        listEvidencias2.add("Vestido");
+        listEvidencias2.add("Blusa");
+        listEvidencias2.add("Camisa");
+        listEvidencias2.add("Pantalón");
+        listEvidencias2.add("Polera");
+        listEvidencias2.add("Chaqueta");
+        listEvidencias2.add("Chaleco");
+        listEvidencias2.add("Calzado");
+        listEvidencias2.add("Otros");
+
+        //artefactos clinica
+        listEvidencias3c.add("Protector");
+        listEvidencias3c.add("Toalla higiénica");
+        listEvidencias3c.add("Otros");
+
+        //artefactos tanato
+        listEvidencias3t.add("Protector");
+        listEvidencias3t.add("Toalla higiénica");        
+        listEvidencias3t.add("Arma blanca");
+        listEvidencias3t.add("Cuchillo");
+        listEvidencias3t.add("Sable");
+        listEvidencias3t.add("Otros");
+        
+        // balistica tanato
+        listEvidencias4.add("Bala");
+        listEvidencias4.add("Otros");
+
+        listEvidencias5.add("Otros");
+
+        listEvidenciasx.add("Seleccione");
+        listEvidenciasx.add("Contenido bucal");
+        listEvidenciasx.add("Contenido vaginal");
+        listEvidenciasx.add("Contenido rectal");
+        listEvidenciasx.add("Lecho ungeal");
+        listEvidenciasx.add("Secreciones");
+        listEvidenciasx.add("Sangre");
+        listEvidenciasx.add("Orina");
+        listEvidenciasx.add("Tejido cerebro");
+        listEvidenciasx.add("Tejido corazón");
+        listEvidenciasx.add("Tejido pulmón");
+        listEvidenciasx.add("Tejido hígado");
+        listEvidenciasx.add("Tejido baso");
+        listEvidenciasx.add("Tejido diafragma");
+        listEvidenciasx.add("Tejido intestino");
+        listEvidenciasx.add("Tejido piel");
+        listEvidenciasx.add("Tejido otros");
+        listEvidenciasx.add("Vestido");
+        listEvidenciasx.add("Blusa");
+        listEvidenciasx.add("Camisa");
+        listEvidenciasx.add("Pantalón");
+        listEvidenciasx.add("Polera");
+        listEvidenciasx.add("Chaqueta");
+        listEvidenciasx.add("Chaleco");
+        listEvidenciasx.add("Calzado");
+        listEvidenciasx.add("Protector");
+        listEvidenciasx.add("Toalla higiénica");
+        listEvidenciasx.add("Arma blanca");
+        listEvidenciasx.add("Cuchillo");
+        listEvidenciasx.add("Sable");
+        listEvidenciasx.add("Bala");
+        listEvidenciasx.add("Otros");
+
+    }
+    
     public List<String> cargarEvidencias(final AjaxBehaviorEvent event) {
         logger.info("selecciono: " + codTipoEvidencia); 
         switch (codTipoEvidencia) {
@@ -427,14 +438,13 @@ public class CrearFormularioPeritoMB {
                 // vestuario tanatologia
                 listEvidenciasx = listEvidencias2;
                 return listEvidenciasx;
-            //vestuario
             case "3":
                 //artefactos clinica
-                listEvidenciasx = listEvidencias3;
+                listEvidenciasx = listEvidencias3c;
                 return listEvidenciasx;
             case "8":
                 //artefactos tanatologia
-                listEvidenciasx = listEvidencias3;
+                listEvidenciasx = listEvidencias3t;
                 return listEvidenciasx;
             case "5":
                 // balistica tanatologia
@@ -447,8 +457,7 @@ public class CrearFormularioPeritoMB {
             case "9":
                 //otros tanatologia
                 listEvidenciasx = listEvidencias5;
-                return listEvidenciasx;
- 
+                return listEvidenciasx; 
         }
         return listEvidenciasx;
     }

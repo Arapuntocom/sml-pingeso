@@ -101,9 +101,7 @@ public class TodoPeritoMB {
         this.usuarioSesion = usuarioEJB.findUsuarioSesionByCuenta(usuarioSis);
 
         this.trasladosList = formularioEJB.traslados(this.formulario);
-//        if(!trasladosList.isEmpty()){
-//            this.trasladosList.remove(trasladosList.size()-1);
-//        }
+
         this.edicionesList = formularioEJB.listaEdiciones(nue);
 
         this.evidenciasList = formularioEJB.findEvidenciaFormularioByFormulario(formulario);

@@ -84,7 +84,7 @@ public class BuscadorChoferMB {
             logger.exiting(this.getClass().getName(), "buscarFormulario", "editarChoferET");
             return "editarChoferET.xhtml?faces-redirect=true";
         }
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "no existe", "Datos no válidos"));
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Formulario inexistente", ""));
         logger.info("formulario no encontrado");
         logger.exiting(this.getClass().getName(), "buscarFormularioChofer", "");
         return "";
@@ -98,7 +98,23 @@ public class BuscadorChoferMB {
         logger.exiting(this.getClass().getName(), "salirChofer", "/indexListo");
         return "/indexListo?faces-redirect=true";
     }
+    
+    //redirecciona a la pagina para realizar una busqueda
+    public String buscar(){
+        logger.entering(this.getClass().getName(), "buscar");
+        httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.usuarioSis);        
+        logger.exiting(this.getClass().getName(), "buscar", "buscadorChofer");
+        return "buscadorChofer?faces-redirect=true";
+    }
 
+    //redirecciona a la pagina para iniciar cadena de custodia
+    public String iniciarCadena(){
+        logger.entering(this.getClass().getName(), "iniciarCadena");
+        httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.usuarioSis);        
+        logger.exiting(this.getClass().getName(), "iniciarCadena", "choferFormulario");
+        return "choferFormulario?faces-redirect=true";
+    }
+    
     public String getUsuarioSis() {
         return usuarioSis;
     }
