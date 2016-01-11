@@ -15,7 +15,6 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -30,10 +29,10 @@ import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
- * @author sebastian
+ * @author Alan
  */
 @Entity
-@Table(name = "Formulario")
+@Table(name = "formulario")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Formulario.findAll", query = "SELECT f FROM Formulario f"),
@@ -50,9 +49,10 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Formulario.findByDelitoRef", query = "SELECT f FROM Formulario f WHERE f.delitoRef = :delitoRef"),
     @NamedQuery(name = "Formulario.findByDescripcionEspecieFormulario", query = "SELECT f FROM Formulario f WHERE f.descripcionEspecieFormulario = :descripcionEspecieFormulario"),
     @NamedQuery(name = "Formulario.findByUltimaEdicion", query = "SELECT f FROM Formulario f WHERE f.ultimaEdicion = :ultimaEdicion"),
-    @NamedQuery(name = "Formulario.findByUnidadPolicial", query = "SELECT f FROM Formulario f WHERE f.unidadPolicial = :unidadPolicial"),
-    @NamedQuery(name = "Formulario.findByBloqueado", query = "SELECT f FROM Formulario f WHERE f.bloqueado = :bloqueado")})
+    @NamedQuery(name = "Formulario.findByBloqueado", query = "SELECT f FROM Formulario f WHERE f.bloqueado = :bloqueado"),
+    @NamedQuery(name = "Formulario.findByUnidadPolicial", query = "SELECT f FROM Formulario f WHERE f.unidadPolicial = :unidadPolicial")})
 public class Formulario implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
@@ -94,21 +94,21 @@ public class Formulario implements Serializable {
     @Column(name = "ultimaEdicion")
     @Temporal(TemporalType.TIMESTAMP)
     private Date ultimaEdicion;
+    @Column(name = "bloqueado")
+    private Boolean bloqueado;
     @Size(max = 45)
     @Column(name = "unidadPolicial")
     private String unidadPolicial;
-    @Column(name = "bloqueado")
-    private Boolean bloqueado;
-    @ManyToMany(mappedBy = "formularioList", fetch = FetchType.EAGER)
-    private List<Evidencia> evidenciaList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "formularioNUE", fetch = FetchType.EAGER)
+    private List<FormularioEvidencia> formularioEvidenciaList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "formularioNUE", fetch = FetchType.EAGER)
     private List<Traslado> trasladoList;
-    @JoinColumn(name = "Usuario_idUsuario", referencedColumnName = "idUsuario")
-    @ManyToOne(optional = false, fetch = FetchType.EAGER)
-    private Usuario usuarioidUsuario;
     @JoinColumn(name = "Usuario_idUsuarioInicia", referencedColumnName = "idUsuario")
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Usuario usuarioidUsuarioInicia;
+    @JoinColumn(name = "Usuario_idUsuario", referencedColumnName = "idUsuario")
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
+    private Usuario usuarioidUsuario;
     @JoinColumn(name = "Semaforo_idSemaforo", referencedColumnName = "idSemaforo")
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Semaforo semaforoidSemaforo;
@@ -226,14 +226,6 @@ public class Formulario implements Serializable {
         this.ultimaEdicion = ultimaEdicion;
     }
 
-    public String getUnidadPolicial() {
-        return unidadPolicial;
-    }
-
-    public void setUnidadPolicial(String unidadPolicial) {
-        this.unidadPolicial = unidadPolicial;
-    }
-
     public Boolean getBloqueado() {
         return bloqueado;
     }
@@ -242,13 +234,21 @@ public class Formulario implements Serializable {
         this.bloqueado = bloqueado;
     }
 
-    @XmlTransient
-    public List<Evidencia> getEvidenciaList() {
-        return evidenciaList;
+    public String getUnidadPolicial() {
+        return unidadPolicial;
     }
 
-    public void setEvidenciaList(List<Evidencia> evidenciaList) {
-        this.evidenciaList = evidenciaList;
+    public void setUnidadPolicial(String unidadPolicial) {
+        this.unidadPolicial = unidadPolicial;
+    }
+
+    @XmlTransient
+    public List<FormularioEvidencia> getFormularioEvidenciaList() {
+        return formularioEvidenciaList;
+    }
+
+    public void setFormularioEvidenciaList(List<FormularioEvidencia> formularioEvidenciaList) {
+        this.formularioEvidenciaList = formularioEvidenciaList;
     }
 
     @XmlTransient
@@ -260,20 +260,20 @@ public class Formulario implements Serializable {
         this.trasladoList = trasladoList;
     }
 
-    public Usuario getUsuarioidUsuario() {
-        return usuarioidUsuario;
-    }
-
-    public void setUsuarioidUsuario(Usuario usuarioidUsuario) {
-        this.usuarioidUsuario = usuarioidUsuario;
-    }
-
     public Usuario getUsuarioidUsuarioInicia() {
         return usuarioidUsuarioInicia;
     }
 
     public void setUsuarioidUsuarioInicia(Usuario usuarioidUsuarioInicia) {
         this.usuarioidUsuarioInicia = usuarioidUsuarioInicia;
+    }
+
+    public Usuario getUsuarioidUsuario() {
+        return usuarioidUsuario;
+    }
+
+    public void setUsuarioidUsuario(Usuario usuarioidUsuario) {
+        this.usuarioidUsuario = usuarioidUsuario;
     }
 
     public Semaforo getSemaforoidSemaforo() {

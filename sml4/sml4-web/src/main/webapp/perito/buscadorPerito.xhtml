@@ -16,7 +16,7 @@
         <div class="container">
             <h:form>
                 <div class="thumbnail">
-                    <div align="center"><h:outputLabel class="input-group-lg" style=" background-color: white" value="Bienvenido(a) #{buscadorPeritoMB.usuarioSesion.nombreUsuario}"></h:outputLabel></div>
+                    <div align="center"><h:outputLabel class="input-group-lg" style=" background-color: white" value="Bienvenido(a) #{buscadorPeritoMB.usuarioSesion.nombreUsuario} #{buscadorPeritoMB.usuarioSesion.apellidoUsuario}"></h:outputLabel></div>
                 </div>
             </h:form> 
 
@@ -33,7 +33,7 @@
                      <h:form>
                         <ul class="nav nav-tabs nav-justified">
 
-                            <li role="presentation" class="active" ><a href="peritoFormulario.xhtml">Iniciar Cadena de Custodia</a></li> 
+                            <li role="presentation"><a href="peritoFormulario.xhtml">Iniciar Cadena de Custodia</a></li> 
                             <li role="presentation" class="active" ><a href="buscadorPerito.xhtml">Buscar Cadena de Custodia</a></li>   
                             <li role="presentation"> <h:commandLink id="cs" action="#{buscadorPeritoMB.salir()}" value="Cerrar sesión"></h:commandLink> </li>
 
@@ -71,7 +71,7 @@
                                     <h:panelGrid columns="4" cellpadding="5" class="ui-grid">
                                         <p:outputLabel for="nue" value="N.U.E.:" style="width:120px"></p:outputLabel>
                                         <h:inputText id="nue" style="margin-right:10px" rendered="true" value = "#{buscadorPeritoMB.nue}" requiredMessage="Debe ingresar el N.U.E."></h:inputText>
-                                        <h:commandButton value="Buscar" label="nue" action = "#{buscadorPeritoMB.buscarFormulario()}" ></h:commandButton>                          
+                                        <p:commandButton value="Buscar" label="nue" action = "#{buscadorPeritoMB.buscarFormulario()}" ></p:commandButton>                          
                                     </h:panelGrid>
                                     <br />
                                     <p:messages id="messages" showDetail="true" autoUpdate="true" closable="true" />

@@ -80,6 +80,7 @@ public class CrearFormularioPeritoMB {
     private List<String> listEvidencias3 = new ArrayList<>();
     private List<String> listEvidencias4 = new ArrayList<>();
     private List<String> listEvidencias5 = new ArrayList<>();
+    private List<String> listEvidencias6 = new ArrayList<>();
     private List<String> listEvidenciasx = new ArrayList<>();
  
     public void iniciarListas() {
@@ -100,6 +101,16 @@ public class CrearFormularioPeritoMB {
         listEvidencias.add("Tejido intestino");
         listEvidencias.add("Tejido piel");
         listEvidencias.add("Tejido otros");
+        listEvidencias.add("Otros");
+        
+        listEvidencias6.add("Contenido bucal");
+        listEvidencias6.add("Contenido vaginal");
+        listEvidencias6.add("Contenido rectal");
+        listEvidencias6.add("Lecho ungeal");
+        listEvidencias6.add("Secreciones");
+        listEvidencias6.add("Sangre");
+        listEvidencias6.add("Orina");
+
         listEvidencias.add("Otros");
  
         listEvidencias2.add("Vestido");
@@ -182,7 +193,7 @@ public class CrearFormularioPeritoMB {
         this.usuarioSesion = (Usuario) usuarioEJB.findUsuarioSesionByCuenta(usuarioSis);
  
         this.cargo = this.usuarioSesion.getCargoidCargo().getNombreCargo();
-        this.levantadaPor = this.usuarioSesion.getNombreUsuario();
+        this.levantadaPor = this.usuarioSesion.getNombreUsuario()+" "+this.usuarioSesion.getApellidoUsuario();
         this.rut = this.usuarioSesion.getRutUsuario();
  
         GregorianCalendar c = new GregorianCalendar();
@@ -194,7 +205,7 @@ public class CrearFormularioPeritoMB {
     public String iniciarFormulario() {
         logger.setLevel(Level.ALL);
         logger.entering(this.getClass().getName(), "iniciarFormularioPerito");
-        String resultado = formularioEJB.crearFormulario(codTipoEvidencia, evidencias, motivo, ruc, rit, nue, parte, cargo, delito, direccionSS, lugar, unidadPolicial, levantadaPor, rut, fecha, observacion, descripcion, usuarioSesion);
+        String resultado = formularioEJB.crearFormulario(codTipoEvidencia, evidencias, motivo, ruc, rit, nue, parte, cargo, delito, direccionSS, lugar, unidadPolicial, this.usuarioSesion.getNombreUsuario(), rut, fecha, observacion, descripcion, usuarioSesion);
  
         //Enviando nue
         httpServletRequest.getSession().setAttribute("nueF", this.nue);
@@ -402,7 +413,7 @@ public class CrearFormularioPeritoMB {
         switch (codTipoEvidencia) {
             case "1":
                 //biologica clinica
-                listEvidenciasx = listEvidencias;
+                listEvidenciasx = listEvidencias6;
                 return listEvidenciasx;
             case "6":
                 //biologica tanatologia

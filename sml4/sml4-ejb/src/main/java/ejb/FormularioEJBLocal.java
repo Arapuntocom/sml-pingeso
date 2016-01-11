@@ -9,6 +9,7 @@ import entity.Area;
 import entity.Cargo;
 import entity.EdicionFormulario;
 import entity.Formulario;
+import entity.FormularioEvidencia;
 import entity.Traslado;
 import entity.Usuario;
 import java.util.Date;
@@ -53,5 +54,7 @@ public interface FormularioEJBLocal {
     public List<Cargo> findAllCargos();
 
     public List<Area> findAllAreas();
+    
+    public List<FormularioEvidencia> findEvidenciaFormularioByFormulario(Formulario formulario);
 }
 

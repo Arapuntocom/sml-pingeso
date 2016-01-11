@@ -9,6 +9,7 @@ import ejb.FormularioEJBLocal;
 import ejb.UsuarioEJBLocal;
 import entity.EdicionFormulario;
 import entity.Formulario;
+import entity.FormularioEvidencia;
 import entity.Traslado;
 import entity.Usuario;
 import java.util.ArrayList;
@@ -63,15 +64,25 @@ public class RecibirPeritoMB {
 
     private String usuarioSis;
     private Usuario usuarioSesion;
-    
+
     private Usuario userEntrega;
 
     private int nue;
 
     private Formulario formulario;
-    
+
     private List<Traslado> trasladosList;
     private List<EdicionFormulario> edicionesList;
+
+    private List<FormularioEvidencia> evidenciasList;
+
+    private String evidencia;
+
+    private int contador = 1;
+
+    private String cambia;
+
+    private List<Traslado> intercalado;
 
     public RecibirPeritoMB() {
         logger.setLevel(Level.ALL);
@@ -92,11 +103,12 @@ public class RecibirPeritoMB {
         this.userEntrega = new Usuario();
         this.trasladosList = new ArrayList<>();
         this.edicionesList = new ArrayList<>();
+        this.intercalado = new ArrayList<>();
         this.formulario = new Formulario();
-        
+
         logger.exiting(this.getClass().getName(), "RecibirPeritoMB");
     }
-    
+
     @PostConstruct
     public void cargarDatos() {
         logger.setLevel(Level.ALL);
@@ -105,30 +117,37 @@ public class RecibirPeritoMB {
         this.usuarioSesion = usuarioEJB.findUsuarioSesionByCuenta(usuarioSis);
         this.trasladosList = formularioEJB.traslados(this.formulario);
         this.edicionesList = formularioEJB.listaEdiciones(nue);
-        
+
         GregorianCalendar c = new GregorianCalendar();
         this.fechaT = c.getTime();
-        
+
         this.usuarioRecibe = usuarioSesion.getNombreUsuario();
         this.usuarioRecibeCargo = usuarioSesion.getCargoidCargo().getNombreCargo();
         this.usuarioRecibeRut = usuarioSesion.getRutUsuario();
-        
+
         this.userEntrega = formularioEJB.obtenerPoseedorFormulario(formulario);
-        
+
         this.usuarioEntrega = userEntrega.getNombreUsuario();
         this.usuarioEntregaCargo = userEntrega.getCargoidCargo().getNombreCargo();
         this.usuarioEntregaRut = userEntrega.getRutUsuario();
-        
+
         this.motivo = "ninguno";
-        //this.motivo = trasladosList.get(trasladosList.size()-1).getTipoMotivoidMotivo().getTipoMotivo();
+
+        this.evidenciasList = formularioEJB.findEvidenciaFormularioByFormulario(formulario);
+        if (!evidenciasList.isEmpty()) {
+            this.evidencia = evidenciasList.get(0).getEvidenciaidEvidencia().getNombreEvidencia();
+        }
+        System.out.println("EVIDENCIA! " + evidencia);
+
+         intercalado(trasladosList);
         
         logger.exiting(this.getClass().getName(), "cargarDatosPerito");
     }
 
     public String agregarTraslado() {
         logger.setLevel(Level.ALL);
-        logger.entering(this.getClass().getName(), "agregarTrasladoPerito");         
-        
+        logger.entering(this.getClass().getName(), "agregarTrasladoPerito");
+
         String resultado = formularioEJB.crearTraslado(formulario, usuarioEntrega, usuarioEntregaCargo, usuarioEntregaRut, usuarioRecibe, usuarioRecibeCargo, usuarioRecibeRut, fechaT, observacionesT, motivo, usuarioSesion);
         if (resultado.equals("Exito")) {
             httpServletRequest.getSession().setAttribute("nueF", this.nue);
@@ -147,6 +166,79 @@ public class RecibirPeritoMB {
         httpServletRequest1.removeAttribute("cuentaUsuario");
         logger.exiting(this.getClass().getName(), "salirPerito", "/indexListo");
         return "/indexListo?faces-redirect=true";
+    }
+
+    public String cambio() {
+
+        if (contador == 1) {
+            cambia = "Entrega";
+            contador++;
+        } else if (contador == 2) {
+            cambia = "Recibe";
+            contador++;
+        } else {
+            contador = 2;
+            cambia = "Entrega";
+        }
+
+        return cambia;
+    }
+
+     private void intercalado(List<Traslado> traslados) {
+
+        for (int i = 0; i < traslados.size(); i++) {
+
+            for (int j = 0; j < 2; j++) {
+                Traslado tras = new Traslado();
+                tras.setFechaEntrega(traslados.get(i).getFechaEntrega());
+                tras.setFormularioNUE(traslados.get(i).getFormularioNUE());
+                tras.setObservaciones(traslados.get(i).getObservaciones());
+                tras.setTipoMotivoidMotivo(traslados.get(i).getTipoMotivoidMotivo());
+
+                if (j == 0) {
+                    tras.setUsuarioidUsuarioEntrega(traslados.get(i).getUsuarioidUsuarioEntrega());
+
+                } else {
+                    tras.setUsuarioidUsuarioEntrega(traslados.get(i).getUsuarioidUsuarioRecibe());
+
+                }
+                intercalado.add(tras);
+
+            }
+
+        }
+        System.out.println(intercalado.toString());
+    }
+    public String getCambia() {
+        return cambia;
+    }
+
+    public void setCambia(String cambia) {
+        this.cambia = cambia;
+    }
+
+    public List<Traslado> getIntercalado() {
+        return intercalado;
+    }
+
+    public void setIntercalado(List<Traslado> intercalado) {
+        this.intercalado = intercalado;
+    }
+
+    public List<FormularioEvidencia> getEvidenciasList() {
+        return evidenciasList;
+    }
+
+    public void setEvidenciasList(List<FormularioEvidencia> evidenciasList) {
+        this.evidenciasList = evidenciasList;
+    }
+
+    public String getEvidencia() {
+        return evidencia;
+    }
+
+    public void setEvidencia(String evidencia) {
+        this.evidencia = evidencia;
     }
 
     public Formulario getFormulario() {

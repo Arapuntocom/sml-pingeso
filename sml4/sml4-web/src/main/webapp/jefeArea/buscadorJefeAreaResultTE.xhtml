@@ -166,7 +166,7 @@
                                     <h4> Mostrando Ediciones</h4>
                                     <div align="center">
 
-                                        <p:dataTable var="ediciones" value="#{resultadoBuscadorTEJefeAreaMB.edicionesList}" emptyMessage="No se han realizado ediciones en esta cadena de custodia." scrollRows="20" scrollable="true" liveScroll="true" scrollHeight="90" style="margin-bottom:0">
+                                        <p:dataTable sortOrder="descending" var="ediciones" value="#{resultadoBuscadorTEJefeAreaMB.edicionesList}" emptyMessage="No se han realizado ediciones en esta cadena de custodia." scrollRows="20" scrollable="true" liveScroll="true" scrollHeight="90" style="margin-bottom:0">
 
                                             <p:column headerText="Editado por">
                                                 <h:outputText value="#{ediciones.usuarioidUsuario.nombreUsuario}" />

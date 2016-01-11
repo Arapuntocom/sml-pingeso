@@ -30,7 +30,7 @@
 
             <h:form>
                 <div class="thumbnail">
-                    <div align="center"><h:outputLabel class="input-group-lg" style=" background-color: white" value="Bienvenido(a) #{crearFormularioPeritoMB.usuarioSesion.nombreUsuario}"></h:outputLabel></div>
+                    <div align="center"><h:outputLabel class="input-group-lg" style=" background-color: white" value="Bienvenido(a) #{crearFormularioPeritoMB.usuarioSesion.nombreUsuario} #{crearFormularioPeritoMB.usuarioSesion.apellidoUsuario}"></h:outputLabel></div>
                 </div>
             </h:form> 
 
@@ -222,7 +222,7 @@
                                     <h:panelGrid columns="5" cellpadding="5" class="ui-grid">
 
                                         <h:outputLabel  style="width:120px" for="nomE" value="Nombre:"></h:outputLabel>
-                                        <p:inputText id="nomE" value="#{crearFormularioPeritoMB.usuarioSesion.nombreUsuario}" label="Nombre" disabled="true">
+                                        <p:inputText id="nomE" value="#{crearFormularioPeritoMB.usuarioSesion.nombreUsuario} #{crearFormularioPeritoMB.usuarioSesion.apellidoUsuario}" label="Nombre" disabled="true">
                                         </p:inputText>
                                         <p:message for="nomE" display="text"/> 
 

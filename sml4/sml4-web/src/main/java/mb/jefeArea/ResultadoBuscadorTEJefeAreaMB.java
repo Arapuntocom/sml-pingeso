@@ -49,10 +49,10 @@ public class ResultadoBuscadorTEJefeAreaMB {
     private List<Traslado> trasladosList;
     private List<EdicionFormulario> edicionesList;
 
-    private int contador=1;
+    private int contador = 1;
 
     private String cambia;
-    
+
     private List<Traslado> intercalado;
 
     static final Logger logger = Logger.getLogger(ResultadoBuscadorTEJefeAreaMB.class.getName());
@@ -101,15 +101,14 @@ public class ResultadoBuscadorTEJefeAreaMB {
 
         if (contador == 1) {
             cambia = "Entrega";
-             contador++;
-        }else if (contador == 2) {
+            contador++;
+        } else if (contador == 2) {
             cambia = "Recibe";
-             contador++;
-        }else {
+            contador++;
+        } else {
             contador = 2;
             cambia = "Entrega";
         }
-         
 
         return cambia;
     }
@@ -122,10 +121,9 @@ public class ResultadoBuscadorTEJefeAreaMB {
         logger.exiting(this.getClass().getName(), "nuevaBusquedaJA", "buscadorJefeArea");
         return "buscadorJefeArea.xhtml?faces-redirect=true";
     }
-    
+
     private void intercalado(List<Traslado> traslados) {
 
-   
         for (int i = 0; i < traslados.size(); i++) {
 
             for (int j = 0; j < 2; j++) {
@@ -134,16 +132,16 @@ public class ResultadoBuscadorTEJefeAreaMB {
                 tras.setFormularioNUE(traslados.get(i).getFormularioNUE());
                 tras.setObservaciones(traslados.get(i).getObservaciones());
                 tras.setTipoMotivoidMotivo(traslados.get(i).getTipoMotivoidMotivo());
-                
+
                 if (j == 0) {
                     tras.setUsuarioidUsuarioEntrega(traslados.get(i).getUsuarioidUsuarioEntrega());
-                    
+
                 } else {
                     tras.setUsuarioidUsuarioEntrega(traslados.get(i).getUsuarioidUsuarioRecibe());
-               
+
                 }
                 intercalado.add(tras);
-           
+
             }
 
         }
@@ -254,7 +252,5 @@ public class ResultadoBuscadorTEJefeAreaMB {
     public void setIntercalado(List<Traslado> intercalado) {
         this.intercalado = intercalado;
     }
-    
-    
 
 }

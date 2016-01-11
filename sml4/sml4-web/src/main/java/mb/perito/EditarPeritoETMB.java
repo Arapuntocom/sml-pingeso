@@ -11,6 +11,7 @@ import ejb.ValidacionVistasMensajesEJBLocal;
 import entity.EdicionFormulario;
 import entity.Evidencia;
 import entity.Formulario;
+import entity.FormularioEvidencia;
 import entity.Traslado;
 import entity.Usuario;
 import java.util.ArrayList;
@@ -62,8 +63,8 @@ public class EditarPeritoETMB {
     private List<EdicionFormulario> edicionesList;
     private List<Traslado> trasladosList;
     
-    private List<Evidencia> evidenciasList;
-    
+    private List<FormularioEvidencia> evidenciasList;
+     private String evidencia;
     //para deshabilitar la edicion de estos campos.
     private boolean isRit;
     private boolean isRuc;
@@ -73,6 +74,12 @@ public class EditarPeritoETMB {
     private int parte;
     private String ruc;
     private String rit;
+    
+    private int contador=1;
+
+    private String cambia;
+    
+    private List<Traslado> intercalado;
 
     static final Logger logger = Logger.getLogger(EditarPeritoETMB.class.getName());
 
@@ -84,6 +91,7 @@ public class EditarPeritoETMB {
         this.edicionesList = new ArrayList();
         this.trasladosList = new ArrayList();
         this.evidenciasList = new ArrayList<>();
+        this.intercalado = new ArrayList<>();
         this.facesContext1 = FacesContext.getCurrentInstance();
         this.httpServletRequest1 = (HttpServletRequest) facesContext1.getExternalContext().getRequest();
 
@@ -116,7 +124,7 @@ public class EditarPeritoETMB {
         this.usuarioSesion = usuarioEJB.findUsuarioSesionByCuenta(usuarioS);
         this.trasladosList = formularioEJB.traslados(formulario);
         this.edicionesList = formularioEJB.listaEdiciones(this.nue);
-        this.evidenciasList = this.formulario.getEvidenciaList();
+        this.evidenciasList = formularioEJB.findEvidenciaFormularioByFormulario(formulario);
         
         if (formulario.getNumeroParte() == 0) {
             this.isParte = false;
@@ -127,6 +135,14 @@ public class EditarPeritoETMB {
         if (formulario.getRit() == null || formulario.getRit().equals("")) {
             this.isRit = false;
         }
+        
+        this.evidenciasList = formularioEJB.findEvidenciaFormularioByFormulario(formulario);
+        if(!evidenciasList.isEmpty())
+            this.evidencia = evidenciasList.get(0).getEvidenciaidEvidencia().getNombreEvidencia();
+        System.out.println("EVIDENCIA! "+evidencia);
+        
+         intercalado(trasladosList);
+        
         logger.exiting(this.getClass().getName(), "cargarDatosPerito");
     }
 
@@ -205,14 +221,80 @@ public class EditarPeritoETMB {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, mensaje," "));
         }
     }
+    
+    public String cambio() {
 
-    public List<Evidencia> getEvidenciasList() {
+        if (contador == 1) {
+            cambia = "Entrega";
+            contador++;
+        } else if (contador == 2) {
+            cambia = "Recibe";
+            contador++;
+        } else {
+            contador = 2;
+            cambia = "Entrega";
+        }
+
+        return cambia;
+    }
+    
+     private void intercalado(List<Traslado> traslados) {
+
+        for (int i = 0; i < traslados.size(); i++) {
+
+            for (int j = 0; j < 2; j++) {
+                Traslado tras = new Traslado();
+                tras.setFechaEntrega(traslados.get(i).getFechaEntrega());
+                tras.setFormularioNUE(traslados.get(i).getFormularioNUE());
+                tras.setObservaciones(traslados.get(i).getObservaciones());
+                tras.setTipoMotivoidMotivo(traslados.get(i).getTipoMotivoidMotivo());
+                
+                if (j == 0) {
+                    tras.setUsuarioidUsuarioEntrega(traslados.get(i).getUsuarioidUsuarioEntrega());
+
+                } else {
+                    tras.setUsuarioidUsuarioEntrega(traslados.get(i).getUsuarioidUsuarioRecibe());
+
+                }
+                intercalado.add(tras);
+
+            }
+
+        }
+        System.out.println(intercalado.toString());
+    }
+
+    public String getCambia() {
+        return cambia;
+    }
+
+    public void setCambia(String cambia) {
+        this.cambia = cambia;
+    }
+
+    public List<Traslado> getIntercalado() {
+        return intercalado;
+    }
+
+    public void setIntercalado(List<Traslado> intercalado) {
+        this.intercalado = intercalado;
+    }
+
+    public String getEvidencia() {
+        return evidencia;
+    }
+
+    public void setEvidencia(String evidencia) {
+        this.evidencia = evidencia;
+    }
+
+    public List<FormularioEvidencia> getEvidenciasList() {
         return evidenciasList;
     }
 
-    public void setEvidenciasList(List<Evidencia> evidenciasList) {
+    public void setEvidenciasList(List<FormularioEvidencia> evidenciasList) {
         this.evidenciasList = evidenciasList;
-    }
+    }   
 
     public int getNue() {
         return nue;

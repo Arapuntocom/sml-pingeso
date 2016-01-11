@@ -24,10 +24,10 @@ import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
- * @author sebastian
+ * @author Alan
  */
 @Entity
-@Table(name = "Semaforo")
+@Table(name = "semaforo")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Semaforo.findAll", query = "SELECT s FROM Semaforo s"),
@@ -35,6 +35,7 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Semaforo.findBySemaforo", query = "SELECT s FROM Semaforo s WHERE s.semaforo = :semaforo"),
     @NamedQuery(name = "Semaforo.findByDescripcionSemaforo", query = "SELECT s FROM Semaforo s WHERE s.descripcionSemaforo = :descripcionSemaforo")})
 public class Semaforo implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)

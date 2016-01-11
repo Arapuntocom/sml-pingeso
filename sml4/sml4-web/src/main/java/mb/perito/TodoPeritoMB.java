@@ -10,6 +10,7 @@ import ejb.UsuarioEJBLocal;
 import entity.EdicionFormulario;
 import entity.Evidencia;
 import entity.Formulario;
+import entity.FormularioEvidencia;
 import entity.Traslado;
 import entity.Usuario;
 import java.util.ArrayList;
@@ -38,14 +39,14 @@ public class TodoPeritoMB {
     private UsuarioEJBLocal usuarioEJB;
 
     @EJB
-    private FormularioEJBLocal formularioEJB;      
+    private FormularioEJBLocal formularioEJB;
 
     private HttpServletRequest httpServletRequest;
     private FacesContext facesContext;
 
     private HttpServletRequest httpServletRequest1;
     private FacesContext facesContext1;
-    
+
     private int nue;
     private String usuarioSis;
     private Usuario usuarioSesion;
@@ -54,11 +55,19 @@ public class TodoPeritoMB {
 
     private List<Traslado> trasladosList;
     private List<EdicionFormulario> edicionesList;
-    
-    private List<Evidencia> evidenciasList;
-    
+
+    private List<FormularioEvidencia> evidenciasList;
+
     private boolean bloqueada;
     private boolean editable;
+
+    private String evidencia;
+
+    private int contador = 1;
+
+    private String cambia;
+
+    private List<Traslado> intercalado;
 
     static final Logger logger = Logger.getLogger(TodoPeritoMB.class.getName());
 
@@ -68,6 +77,7 @@ public class TodoPeritoMB {
         this.trasladosList = new ArrayList<>();
         this.edicionesList = new ArrayList<>();
         this.evidenciasList = new ArrayList<>();
+        this.intercalado = new ArrayList<>();
         facesContext = FacesContext.getCurrentInstance();
         httpServletRequest = (HttpServletRequest) facesContext.getExternalContext().getRequest();
         if (httpServletRequest.getSession().getAttribute("nueF") != null) {
@@ -89,21 +99,27 @@ public class TodoPeritoMB {
         logger.entering(this.getClass().getName(), "cargarDatosPerito");
         this.formulario = formularioEJB.findFormularioByNue(this.nue);
         this.usuarioSesion = usuarioEJB.findUsuarioSesionByCuenta(usuarioSis);
-        
+
         this.trasladosList = formularioEJB.traslados(this.formulario);
 //        if(!trasladosList.isEmpty()){
 //            this.trasladosList.remove(trasladosList.size()-1);
 //        }
         this.edicionesList = formularioEJB.listaEdiciones(nue);
-        
-        this.evidenciasList = this.formulario.getEvidenciaList();
-        
+
+        this.evidenciasList = formularioEJB.findEvidenciaFormularioByFormulario(formulario);
+        if (!evidenciasList.isEmpty()) {
+            this.evidencia = evidenciasList.get(0).getEvidenciaidEvidencia().getNombreEvidencia();
+        }
+        System.out.println("EVIDENCIA! " + evidencia);
+
         this.bloqueada = formulario.getBloqueado();
         this.editable = formularioEJB.esParticipanteCC(formulario, usuarioSesion);
         logger.log(Level.INFO, "editable {0}", editable);
-        if(bloqueada){
+        if (bloqueada) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Esta cadena de custodia se encuentra cerrada.", ""));
-        } 
+        }
+
+         intercalado(trasladosList);
         
         logger.log(Level.INFO, "formulario ruc {0}", this.formulario.getRuc());
         logger.log(Level.FINEST, "todos cant traslados {0}", this.trasladosList.size());
@@ -124,11 +140,11 @@ public class TodoPeritoMB {
         logger.setLevel(Level.ALL);
         logger.entering(this.getClass().getName(), "editar");
         httpServletRequest.getSession().setAttribute("nueF", this.nue);
-        httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.usuarioSis);        
+        httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.usuarioSis);
         logger.exiting(this.getClass().getName(), "editar", "editarPeritoET");
         return "editarPeritoET.xhtml?faces-redirect=true";
     }
-    
+
     public String nuevaCadena() {
         logger.setLevel(Level.ALL);
         logger.entering(this.getClass().getName(), "nuevaCadena");
@@ -138,16 +154,16 @@ public class TodoPeritoMB {
         logger.exiting(this.getClass().getName(), "nuevaCadena", "peritoFormulario");
         return "peritoFormulario?faces-redirect=true";
     }
-    
+
     //envía a la página para recibir la cadena
-    public String recibirCadena(){ 
+    public String recibirCadena() {
         logger.setLevel(Level.ALL);
         logger.entering(this.getClass().getName(), "recibirCadena");
         httpServletRequest.getSession().setAttribute("nueF", this.nue);
-        httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.usuarioSis); 
-        
+        httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.usuarioSis);
+
         //si el siguiente traslado es para peritaje, enviamos a la vista para recibir para peritaje 
-        if(trasladosList.get(trasladosList.size()-1).getTipoMotivoidMotivo().getTipoMotivo().equals("Peritaje")){
+        if (trasladosList.get(trasladosList.size() - 1).getTipoMotivoidMotivo().getTipoMotivo().equals("Peritaje")) {
             logger.exiting(this.getClass().getName(), "recibirCadena", "recibirPeritoETP");
             return "recibirPeritoETP?faces-redirect=true";
         }
@@ -156,11 +172,77 @@ public class TodoPeritoMB {
         return "recibirPeritoET?faces-redirect=true";
     }
 
-    public List<Evidencia> getEvidenciasList() {
+    public String cambio() {
+
+        if (contador == 1) {
+            cambia = "Entrega";
+            contador++;
+        } else if (contador == 2) {
+            cambia = "Recibe";
+            contador++;
+        } else {
+            contador = 2;
+            cambia = "Entrega";
+        }
+
+        return cambia;
+    }
+
+     private void intercalado(List<Traslado> traslados) {
+
+        for (int i = 0; i < traslados.size(); i++) {
+
+            for (int j = 0; j < 2; j++) {
+                Traslado tras = new Traslado();
+                tras.setFechaEntrega(traslados.get(i).getFechaEntrega());
+                tras.setFormularioNUE(traslados.get(i).getFormularioNUE());
+                tras.setObservaciones(traslados.get(i).getObservaciones());
+                tras.setTipoMotivoidMotivo(traslados.get(i).getTipoMotivoidMotivo());
+
+                if (j == 0) {
+                    tras.setUsuarioidUsuarioEntrega(traslados.get(i).getUsuarioidUsuarioEntrega());
+
+                } else {
+                    tras.setUsuarioidUsuarioEntrega(traslados.get(i).getUsuarioidUsuarioRecibe());
+
+                }
+                intercalado.add(tras);
+
+            }
+
+        }
+        System.out.println(intercalado.toString());
+    }
+    
+    public String getCambia() {
+        return cambia;
+    }
+
+    public void setCambia(String cambia) {
+        this.cambia = cambia;
+    }
+
+    public List<Traslado> getIntercalado() {
+        return intercalado;
+    }
+
+    public void setIntercalado(List<Traslado> intercalado) {
+        this.intercalado = intercalado;
+    }
+
+    public String getEvidencia() {
+        return evidencia;
+    }
+
+    public void setEvidencia(String evidencia) {
+        this.evidencia = evidencia;
+    }
+
+    public List<FormularioEvidencia> getEvidenciasList() {
         return evidenciasList;
     }
 
-    public void setEvidenciasList(List<Evidencia> evidenciasList) {
+    public void setEvidenciasList(List<FormularioEvidencia> evidenciasList) {
         this.evidenciasList = evidenciasList;
     }
 
@@ -171,7 +253,7 @@ public class TodoPeritoMB {
     public void setEdicionesList(List<EdicionFormulario> edicionesList) {
         this.edicionesList = edicionesList;
     }
-    
+
     public List<Traslado> getTrasladosList() {
         return trasladosList;
     }
@@ -211,7 +293,7 @@ public class TodoPeritoMB {
     public void setUsuarioSesion(Usuario usuarioSesion) {
         this.usuarioSesion = usuarioSesion;
     }
-    
+
     public boolean isBloqueada() {
         return bloqueada;
     }

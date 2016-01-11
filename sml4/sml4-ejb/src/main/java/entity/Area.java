@@ -25,16 +25,17 @@ import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
- * @author sebastian
+ * @author Alan
  */
 @Entity
-@Table(name = "Area")
+@Table(name = "area")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Area.findAll", query = "SELECT a FROM Area a"),
     @NamedQuery(name = "Area.findByIdArea", query = "SELECT a FROM Area a WHERE a.idArea = :idArea"),
     @NamedQuery(name = "Area.findByNombreArea", query = "SELECT a FROM Area a WHERE a.nombreArea = :nombreArea")})
 public class Area implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,9 +46,9 @@ public class Area implements Serializable {
     @Column(name = "nombreArea")
     private String nombreArea;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "areaidArea", fetch = FetchType.EAGER)
-    private List<TipoEvidencia> tipoEvidenciaList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "areaidArea", fetch = FetchType.EAGER)
     private List<Usuario> usuarioList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "areaidArea", fetch = FetchType.EAGER)
+    private List<TipoEvidencia> tipoEvidenciaList;
 
     public Area() {
     }
@@ -73,21 +74,21 @@ public class Area implements Serializable {
     }
 
     @XmlTransient
-    public List<TipoEvidencia> getTipoEvidenciaList() {
-        return tipoEvidenciaList;
-    }
-
-    public void setTipoEvidenciaList(List<TipoEvidencia> tipoEvidenciaList) {
-        this.tipoEvidenciaList = tipoEvidenciaList;
-    }
-
-    @XmlTransient
     public List<Usuario> getUsuarioList() {
         return usuarioList;
     }
 
     public void setUsuarioList(List<Usuario> usuarioList) {
         this.usuarioList = usuarioList;
+    }
+
+    @XmlTransient
+    public List<TipoEvidencia> getTipoEvidenciaList() {
+        return tipoEvidenciaList;
+    }
+
+    public void setTipoEvidenciaList(List<TipoEvidencia> tipoEvidenciaList) {
+        this.tipoEvidenciaList = tipoEvidenciaList;
     }
 
     @Override
