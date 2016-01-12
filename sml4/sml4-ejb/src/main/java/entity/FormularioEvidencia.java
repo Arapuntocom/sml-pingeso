@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author Aracelly 
+ * @author Alan
  */
 @Entity
 @Table(name = "formulario_evidencia")
@@ -30,8 +30,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "FormularioEvidencia.findAll", query = "SELECT f FROM FormularioEvidencia f"),
     @NamedQuery(name = "FormularioEvidencia.findByIdFormularioEvidencia", query = "SELECT f FROM FormularioEvidencia f WHERE f.idFormularioEvidencia = :idFormularioEvidencia"),
-    @NamedQuery(name = "FormularioEvidencia.findByFormulario", query = "SELECT f FROM FormularioEvidencia f WHERE f.formularioNUE = :formularioNUE")
-})
+@NamedQuery(name = "FormularioEvidencia.findByFormulario", query = "SELECT f FROM FormularioEvidencia f WHERE f.formularioNUE = :formularioNUE")})
 public class FormularioEvidencia implements Serializable {
 
     private static final long serialVersionUID = 1L;

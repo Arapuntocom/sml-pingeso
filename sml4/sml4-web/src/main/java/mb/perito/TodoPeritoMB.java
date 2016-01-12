@@ -170,7 +170,7 @@ public class TodoPeritoMB {
         return "recibirPeritoET?faces-redirect=true";
     }
 
-    public String cambio() {
+  public String cambio() {
 
         if (contador == 1) {
             cambia = "Entrega";

@@ -7,6 +7,7 @@ package mb.chofer;
 
 import ejb.FormularioEJBLocal;
 import ejb.UsuarioEJBLocal;
+import ejb.ValidacionVistasMensajesEJBLocal;
 import entity.Usuario;
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,7 +33,8 @@ import javax.servlet.http.HttpServletRequest;
 @RequestScoped
 @ManagedBean
 public class CrearFormularioChoferMB {
-
+    @EJB
+    private ValidacionVistasMensajesEJBLocal validacionVistasMensajesEJB;
     @EJB
     private UsuarioEJBLocal usuarioEJB;
     @EJB
@@ -122,11 +124,49 @@ public class CrearFormularioChoferMB {
     public String iniciarFormulario() {
         logger.setLevel(Level.ALL);
         logger.entering(this.getClass().getName(), "iniciarFormularioChofer");
-        logger.log(Level.FINEST, "formulario nue {0}", this.nue);
-        logger.log(Level.FINEST, "usuario inicia rut {0}", this.rut);
-        logger.log(Level.FINEST, "formulario fecha {0}", this.fecha);
-        logger.log(Level.FINEST, "usuario inicia cargo {0}", this.cargo);
 
+        boolean datosIncorrectos = false;
+        if (parte != 0) {                  
+            String mensaje = validacionVistasMensajesEJB.checkParte(parte);
+            if(!mensaje.equals("Exito")){                              
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, mensaje," "));
+                datosIncorrectos = true;
+            }            
+        }
+        if (ruc != null) {            
+            String mensaje = validacionVistasMensajesEJB.checkRuc(ruc);
+            if(!mensaje.equals("Exito")){                
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, mensaje," "));
+                datosIncorrectos = true;
+            }
+        }
+        if (rit != null) {            
+            String mensaje = validacionVistasMensajesEJB.checkRit(rit);
+            if(!mensaje.equals("Exito")){                
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, mensaje," "));
+                datosIncorrectos = true;
+            }
+        }
+        if(nue != 0){
+            if(nue <0){
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Debe ingresar un N.U.E válido"," "));
+                datosIncorrectos = true;
+            }
+        }
+       
+        if("0".equals(evidencias) || "0".equals(codTipoEvidencia)){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Debe seleccionar Evidencia y Tipo de Evidencia"," "));
+            datosIncorrectos = true;        
+        }        
+        
+        if(datosIncorrectos){
+            httpServletRequest.getSession().setAttribute("nueF", this.nue);
+            httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.usuarioSis);
+            logger.exiting(this.getClass().getName(), "editarFormularioPerito", "");
+            return "";
+        }    
+        
+        
         String resultado = formularioEJB.crearFormulario(codTipoEvidencia, evidencias, motivo, ruc, rit, nue, parte, cargo, delito, direccionSS, lugar, unidadPolicial, levantadaPor, rut, fecha, observacion, descripcion, usuarioS);
 
         if (resultado.equals("Exito")) {

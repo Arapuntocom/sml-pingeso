@@ -40,6 +40,8 @@ public class ResultadoBuscadorUserJefeaAreaMB {
 
     private String rut;
     private Usuario usuarioBuscado;
+    
+    private String estadoUsuarioEspanol;
 
     private static final Logger logger = Logger.getLogger(ResultadoBuscadorUserJefeaAreaMB.class.getName());
 
@@ -72,11 +74,22 @@ public class ResultadoBuscadorUserJefeaAreaMB {
         logger.entering(this.getClass().getName(), "CargarDatosJefeArea");
         this.usuarioSesion = usuarioEJB.findUsuarioSesionByCuenta(this.userSesion);
         this.usuarioBuscado = usuarioEJB.findUserByRut(this.rut);
+        latino();
+                
+        
         logger.log(Level.INFO, "Nombre usuario {0}", this.usuarioBuscado.getNombreUsuario());
         logger.log(Level.FINEST, "Rut usuario {0}", this.usuarioBuscado.getRutUsuario());
         logger.exiting(this.getClass().getName(), "CargarDatosJefeArea");
     }
 
+    private void latino(){
+    boolean estado = this.usuarioBuscado.getEstadoUsuario();
+        if(estado)
+            estadoUsuarioEspanol = "Habilitado";
+        else
+            estadoUsuarioEspanol = "Deshabilitado";
+    }
+    
     public String habilitarUsuario() {
         logger.setLevel(Level.ALL);
         logger.entering(this.getClass().getName(), "habilitarUsuario");
@@ -87,8 +100,9 @@ public class ResultadoBuscadorUserJefeaAreaMB {
             httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.userSesion);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Usuario ha sido habilitado correctamente", ""));
             logger.exiting(this.getClass().getName(), "habilitarUsuario", "buscadorJefeAreaResultUsuario");
-            //return "buscadorJefeAreaResultUsuario.xhtml?faces-redirect=true";
-            return "";
+            latino();
+            return "buscadorJefeAreaResultUsuario.xhtml?faces-redirect=true";
+            //return "";
         }
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Usuario ya se encuentra habilitado", ""));
         logger.info("Usuario ya se encuentra habilitado");
@@ -106,8 +120,8 @@ public class ResultadoBuscadorUserJefeaAreaMB {
             httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.userSesion);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Usuario ha sido deshabilitado correctamente", ""));
             logger.exiting(this.getClass().getName(), "deshabilitarUsuario", "buscadorJefeAreaResultUsuario");
-            //return "buscadorJefeAreaResultUsuario.xhtml?faces-redirect=true";
-            return "";
+            return "buscadorJefeAreaResultUsuario.xhtml?faces-redirect=true";
+           // return "";
         }
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Usuario ya se encuentra deshabilitado", ""));
         logger.info("Usuario ya se encuentra deshabilitado");
@@ -154,6 +168,14 @@ public class ResultadoBuscadorUserJefeaAreaMB {
         httpServletRequest1.removeAttribute("cuentaUsuario");
         logger.exiting(this.getClass().getName(), "salirJefeArea", "/indexListo");
         return "/indexListo?faces-redirect=true";
+    }
+
+    public String getEstadoUsuarioEspanol() {
+        return estadoUsuarioEspanol;
+    }
+
+    public void setEstadoUsuarioEspanol(String estadoUsuarioEspanol) {
+        this.estadoUsuarioEspanol = estadoUsuarioEspanol;
     }
 
     public String getUserSesion() {

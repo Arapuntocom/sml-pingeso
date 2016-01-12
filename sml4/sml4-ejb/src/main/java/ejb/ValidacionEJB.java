@@ -198,9 +198,8 @@ public class ValidacionEJB implements ValidacionEJBLocal {
                     direccion = "/perito/buscadorPerito.xhtml?faces-redirect=true";
                 } else if (foundUser.getCargoidCargo().getNombreCargo().equals("Jefe de área")) {
                     direccion = "/jefeArea/buscadorJefeArea.xhtml?faces-redirect=true";
-                } else if(foundUser.getCargoidCargo().getNombreCargo().equals("Administrador")) {
-                    direccion = "";
-                
+                } else if(foundUser.getCargoidCargo().getNombreCargo().equals("Administrativo")) {
+                    direccion = "/administrador/buscadorAdministrador.xhtml?faces-redirect=true";                
                 }
             }
         }

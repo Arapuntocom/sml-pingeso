@@ -39,12 +39,12 @@ public class TodoMB {
     @EJB
     private UsuarioEJBLocal usuarioEJB;
 
-   @EJB
+    @EJB
     private FormularioDigitadorLocal formularioDigitador;
 
-   @EJB
+    @EJB
     private FormularioEJBLocal formularioEJB;
-   
+
     private HttpServletRequest httpServletRequest;
     private FacesContext facesContext;
 
@@ -77,11 +77,12 @@ public class TodoMB {
 
     private List<FormularioEvidencia> evidenciasList;
     private String evidencia;
-    
+
     private List<Traslado> trasladosList;
-    
+
     private boolean bloqueada;
-    
+    private boolean editable;
+
     private int contador = 1;
     private String cambia;
     private List<Traslado> intercalado;
@@ -112,6 +113,7 @@ public class TodoMB {
             this.rutInicia = (String) httpServletRequest2.getSession().getAttribute("rutInicia");
             logger.log(Level.FINEST, "RutInicia recibido {0}", this.rutInicia);
         }
+        this.intercalado = new ArrayList();
         this.evidenciasList = new ArrayList();
         this.usuarioInicia = new Usuario();
         this.usuarioSesion = new Usuario();
@@ -126,16 +128,20 @@ public class TodoMB {
         this.formulario = formularioEJB.findFormularioByNue(this.nue);
         this.trasladosList = formularioEJB.traslados(this.formulario);
         this.usuarioInicia = usuarioEJB.findUserByRut(rutInicia);
-                
+
         this.evidenciasList = formularioEJB.findEvidenciaFormularioByFormulario(formulario);
         if (!evidenciasList.isEmpty()) {
             this.evidencia = evidenciasList.get(0).getEvidenciaidEvidencia().getNombreEvidencia();
         }
-        
-        intercalado = new ArrayList<>();
-         intercalado(trasladosList);
-        
+
+        intercalado(trasladosList);
+
         this.bloqueada = formulario.getBloqueado();
+        this.editable = formularioEJB.esParticipanteCC(formulario, usuarioSesion);
+        logger.log(Level.INFO, "editable {0}", editable);
+        if (bloqueada) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Esta cadena de custodia se encuentra cerrada.", ""));
+        }
         logger.exiting(this.getClass().getName(), "cargarDatosDigitador");
     }
 
@@ -147,16 +153,16 @@ public class TodoMB {
         logger.exiting(this.getClass().getName(), "salirDigitador", "/indexListo");
         return "/indexListo?faces-redirect=true";
     }
-    
+
     //redirecciona a la pagina para iniciar cadena de custodia
-    public String nuevaCadena(){
+    public String nuevaCadena() {
         logger.entering(this.getClass().getName(), "iniciarCadena");
-        httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.usuarioSis);        
+        httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.usuarioSis);
         logger.exiting(this.getClass().getName(), "iniciarCadena", "digitadorFormularioHU11");
         return "digitadorFormularioHU11?faces-redirect=true";
     }
-    
-     public String agregarTraslado() {
+
+    public String agregarTraslado() {
         logger.setLevel(Level.ALL);
         logger.entering(this.getClass().getName(), "agregarTrasladoDigitador");
         logger.log(Level.FINEST, "rut usuario entrega {0}", this.usuarioEntrega);
@@ -165,8 +171,8 @@ public class TodoMB {
         String resultado = formularioDigitador.crearTraslado(formulario, usuarioInicia, usuarioRecibe, usuarioRecibeCargo, usuarioRecibeRut, fechaT, observacionesT, motivo, usuarioSesion);
         if (resultado.equals("Exito")) {
             httpServletRequest.getSession().setAttribute("nueF", this.nue);
-            httpServletRequest.getSession().setAttribute("cuentaUsuario", this.usuarioSis);
-            httpServletRequest.getSession().setAttribute("rutInicia", this.rutInicia);
+            httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.usuarioSis);
+            httpServletRequest2.getSession().setAttribute("rutInicia", this.usuarioRecibeRut);
             logger.exiting(this.getClass().getName(), "agregarTrasladoDigitador", "todoHU11?faces-redirect=true");
             return "todoHU11?faces-redirect=true";
         }
@@ -174,7 +180,7 @@ public class TodoMB {
         logger.exiting(this.getClass().getName(), "agregarTrasladoDigitador", "");
         return "";
     }
-    
+
     public String cambio() {
 
         if (contador == 1) {
@@ -264,7 +270,7 @@ public class TodoMB {
     public void setIntercalado(List<Traslado> intercalado) {
         this.intercalado = intercalado;
     }
-    
+
     public String getUsuarioEntrega() {
         return usuarioEntrega;
     }

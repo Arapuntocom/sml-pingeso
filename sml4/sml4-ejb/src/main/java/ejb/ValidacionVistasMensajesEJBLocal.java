@@ -9,12 +9,15 @@ import javax.ejb.Local;
 
 /**
  *
- * @author Alan
+ * @author Aracelly
  */
 @Local
 public interface ValidacionVistasMensajesEJBLocal {
     public String checkRuc(String ruc);
     public String checkRit(String rit);    
+    public String checkRucE(String ruc);
+    public String checkRitE(String rit);  
 
     public String checkParte(Integer numeroParte);
+    public String checkRut(String rut);
 }

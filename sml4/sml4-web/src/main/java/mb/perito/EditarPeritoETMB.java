@@ -164,7 +164,7 @@ public class EditarPeritoETMB {
         if (this.isRuc == false && formulario.getRuc() != null && !formulario.getRuc().equals("")) {
             ruc = formulario.getRuc();
             logger.log(Level.INFO, "MB ruc -> {0}", ruc);   
-            String mensaje = validacionVistasMensajesEJB.checkRuc(formulario.getRuc());
+            String mensaje = validacionVistasMensajesEJB.checkRucE(formulario.getRuc());
             if(mensaje.equals("Exito"))
                 isRuc = true;
             else{                
@@ -175,7 +175,7 @@ public class EditarPeritoETMB {
         if (this.isRit == false && formulario.getRit() != null && !formulario.getRit().equals("")) {
             rit = formulario.getRit();
             logger.log(Level.INFO, "MB rit -> {0}", rit);
-            String mensaje = validacionVistasMensajesEJB.checkRit(formulario.getRit());
+            String mensaje = validacionVistasMensajesEJB.checkRitE(formulario.getRit());
             if(mensaje.equals("Exito"))
                 isRit = true;
             else{                
@@ -222,7 +222,7 @@ public class EditarPeritoETMB {
         }
     }
     
-    public String cambio() {
+   public String cambio() {
 
         if (contador == 1) {
             cambia = "Entrega";

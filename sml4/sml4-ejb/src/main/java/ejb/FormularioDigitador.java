@@ -216,18 +216,18 @@ public class FormularioDigitador implements FormularioDigitadorLocal {
     }
 
     //ZACK
-    private Usuario crearExterno1(String cargo, String nombre, String rut) {
+    private Usuario crearExterno1(String cargo,String nombre, String rut) {
         logger.setLevel(Level.ALL);
         logger.entering(this.getClass().getName(), "crearExterno");
 
         Usuario nuevoExterno = new Usuario();
         //area se esta entregando otro
-        Area areaExterno = areaFacade.findByArea("Otro");
+        Area areaExterno = areaFacade.findByArea("Externo");
         TipoUsuario tue = tipoUsuarioFacade.findByTipo("Externo");
         //buscando cargo, en el caso que no exista se crea
         Cargo cargoExterno = cargoFacade.findByCargo(cargo);
         if (cargoExterno == null) {
-            cargoExterno = cargoFacade.findByCargo("Externo");
+            cargoExterno = cargoFacade.findByCargo("Otro");
             if(cargoExterno == null){
                 return null;
             }
@@ -311,7 +311,7 @@ public class FormularioDigitador implements FormularioDigitadorLocal {
         //Verificando usuario Recibe
         usuarioRecibeP = usuarioFacade.findByRUN(usuarioRecibeRut);
         if (usuarioRecibeP == null) {
-            usuarioRecibeP = crearExterno1(usuarioRecibeCargo, usuarioRecibe, usuarioRecibeRut);
+            usuarioRecibeP = crearExterno1(usuarioRecibeCargo,usuarioRecibe, usuarioRecibeRut);
             if (usuarioRecibeP == null) {
                 logger.exiting(this.getClass().getName(), "crearTraslado", "Error con creacion usuario Recibe");
                 return "Error con datos de la persona que recibe.";
@@ -345,15 +345,12 @@ public class FormularioDigitador implements FormularioDigitadorLocal {
 
         //verificamos si se se trata de un peritaje, lo cual finaliza la cc.
         if (nuevoTraslado.getTipoMotivoidMotivo().getTipoMotivo().equals("Peritaje")) {
-            if (uSesion.getCargoidCargo().getNombreCargo().equals("Tecnico") || uSesion.getCargoidCargo().getNombreCargo().equals("Perito")) {
+            //quite la restriccion de que solo puede cerrar un tecnico o perito, porque dadas las circunstancias, no se puede asegurar.
                 logger.info("se realiza peritaje, por tanto se finaliza la cc.");
-
                 formulario.setBloqueado(true);
                 logger.info("se inicia la edición del formulario para bloquearlo");
                 formularioFacade.edit(formulario);
-                logger.info("se finaliza la edición del formulario para bloquearlo");
-
-            }
+                logger.info("se finaliza la edición del formulario para bloquearlo");           
         }
 
         logger.exiting(this.getClass().getName(), "crearTraslado", "Exito");
