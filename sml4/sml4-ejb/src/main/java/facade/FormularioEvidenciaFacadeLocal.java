@@ -7,6 +7,7 @@ package facade;
 
 import entity.Formulario;
 import entity.FormularioEvidencia;
+import entity.TipoEvidencia;
 import java.util.List;
 import javax.ejb.Local;
 
@@ -31,5 +32,7 @@ public interface FormularioEvidenciaFacadeLocal {
 
     int count();
     
-    public List<FormularioEvidencia> findByFormulario(Formulario formulario);    
+    List<FormularioEvidencia> findByFormulario(Formulario formulario); 
+    
+    List<FormularioEvidencia> findByTE(TipoEvidencia te);
 }

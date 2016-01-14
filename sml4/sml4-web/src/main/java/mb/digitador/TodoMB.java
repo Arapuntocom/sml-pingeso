@@ -8,7 +8,7 @@ package mb.digitador;
 import ejb.FormularioDigitadorLocal;
 import ejb.FormularioEJBLocal;
 import ejb.UsuarioEJBLocal;
-import entity.EdicionFormulario;
+import ejb.ValidacionVistasMensajesEJBLocal;
 import entity.Formulario;
 import entity.FormularioEvidencia;
 import entity.Traslado;
@@ -37,6 +37,9 @@ import javax.servlet.http.HttpServletRequest;
 public class TodoMB {
 
     @EJB
+    private ValidacionVistasMensajesEJBLocal validacionVistasMensajesEJB;
+
+    @EJB
     private UsuarioEJBLocal usuarioEJB;
 
     @EJB
@@ -54,10 +57,15 @@ public class TodoMB {
     private HttpServletRequest httpServletRequest2;
     private FacesContext facesContext2;
 
-    private String usuarioEntrega;
-    private String usuarioEntregaUnidad;
-    private String usuarioEntregaCargo;
-    private String usuarioEntregaRut;
+    private HttpServletRequest httpServletRequest3;
+    private FacesContext facesContext3;
+
+    private HttpServletRequest httpServletRequest4;
+    private FacesContext facesContext4;
+
+    private HttpServletRequest httpServletRequest5;
+    private FacesContext facesContext5;
+
     private String usuarioRecibe;
     private String usuarioRecibeUnidad;
     private String usuarioRecibeCargo;
@@ -109,10 +117,19 @@ public class TodoMB {
 
         facesContext2 = FacesContext.getCurrentInstance();
         httpServletRequest2 = (HttpServletRequest) facesContext2.getExternalContext().getRequest();
-        if (httpServletRequest2.getSession().getAttribute("rutInicia") != null) {
-            this.rutInicia = (String) httpServletRequest2.getSession().getAttribute("rutInicia");
+        if (httpServletRequest2.getSession().getAttribute("rutInicia1") != null) {
+            this.rutInicia = (String) httpServletRequest2.getSession().getAttribute("rutInicia1");
             logger.log(Level.FINEST, "RutInicia recibido {0}", this.rutInicia);
         }
+
+        facesContext3 = FacesContext.getCurrentInstance();
+        httpServletRequest3 = (HttpServletRequest) facesContext3.getExternalContext().getRequest();
+
+        facesContext4 = FacesContext.getCurrentInstance();
+        httpServletRequest4 = (HttpServletRequest) facesContext4.getExternalContext().getRequest();
+
+        facesContext5 = FacesContext.getCurrentInstance();
+        httpServletRequest5 = (HttpServletRequest) facesContext5.getExternalContext().getRequest();
         this.intercalado = new ArrayList();
         this.evidenciasList = new ArrayList();
         this.usuarioInicia = new Usuario();
@@ -128,11 +145,6 @@ public class TodoMB {
         this.formulario = formularioEJB.findFormularioByNue(this.nue);
         this.trasladosList = formularioEJB.traslados(this.formulario);
         this.usuarioInicia = usuarioEJB.findUserByRut(rutInicia);
-
-        this.evidenciasList = formularioEJB.findEvidenciaFormularioByFormulario(formulario);
-        if (!evidenciasList.isEmpty()) {
-            this.evidencia = evidenciasList.get(0).getEvidenciaidEvidencia().getNombreEvidencia();
-        }
 
         intercalado(trasladosList);
 
@@ -165,19 +177,58 @@ public class TodoMB {
     public String agregarTraslado() {
         logger.setLevel(Level.ALL);
         logger.entering(this.getClass().getName(), "agregarTrasladoDigitador");
-        logger.log(Level.FINEST, "rut usuario entrega {0}", this.usuarioEntrega);
-        logger.log(Level.FINEST, "rut usuario recibe {0}", this.usuarioRecibe);
-        logger.log(Level.FINEST, "rut motivo {0}", this.motivo);
-        String resultado = formularioDigitador.crearTraslado(formulario, usuarioInicia, usuarioRecibe, usuarioRecibeCargo, usuarioRecibeRut, fechaT, observacionesT, motivo, usuarioSesion);
+        //logger.log(Level.FINEST, "rut usuario entrega {0}", this.usuarioEntrega);
+        logger.log(Level.FINEST, " usuario recibe {0}", this.usuarioRecibe);
+        logger.log(Level.FINEST, "motivo {0}", this.motivo);
+
+        if (usuarioRecibeRut == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Debe ingresar un R.U.T. válido", " "));
+
+            logger.exiting(this.getClass().getName(), "agregarTrasladoDigitador", "Debe ingresar el rut");
+            return "";
+
+        } else {
+            String mensaje = validacionVistasMensajesEJB.checkRut(usuarioRecibeRut);
+            if (!mensaje.equals("Exito")) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, mensaje, " "));
+                logger.exiting(this.getClass().getName(), "agregarTrasladoDigitador", "Rut ingresado inválido");
+                return "";
+
+            }
+        }
+        if (usuarioRecibe == null || usuarioRecibe.equals("")) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Debe ingresar un nombre válido", " "));
+            logger.exiting(this.getClass().getName(), "agregarTrasladoDigitador", "Debe ingresar un nombre valido");
+            return "";
+
+        }
+
+        if ("".equals(usuarioRecibeCargo) || "".equals(usuarioRecibeUnidad) || usuarioRecibeCargo == null || usuarioRecibeUnidad == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Debe seleccionar el cargo y unidad", " "));
+            logger.exiting(this.getClass().getName(), "agregarTrasladoDigitador", "debbe seleccionar cargo o unidad");
+            return "";
+        }
+
+        if (motivo == null || motivo.equals("")) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Debe especificar el motivo del traslado", " "));
+            logger.exiting(this.getClass().getName(), "agregarTrasladoDigitador", "Debe especificar el motivo del traslado");
+            return "";
+        }
+
+        String resultado = formularioDigitador.crearTraslado(formulario, usuarioInicia, usuarioRecibe, usuarioRecibeCargo, usuarioRecibeRut, usuarioRecibeUnidad, fechaT, observacionesT, motivo, usuarioSesion);
         if (resultado.equals("Exito")) {
-            httpServletRequest.getSession().setAttribute("nueF", this.nue);
-            httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.usuarioSis);
-            httpServletRequest2.getSession().setAttribute("rutInicia", this.usuarioRecibeRut);
+            httpServletRequest3.getSession().setAttribute("nueF", this.nue);
+            httpServletRequest4.getSession().setAttribute("cuentaUsuario", this.usuarioSis);
+            httpServletRequest5.getSession().setAttribute("rutInicia1", this.usuarioRecibeRut);
+
             logger.exiting(this.getClass().getName(), "agregarTrasladoDigitador", "todoHU11?faces-redirect=true");
             return "todoHU11?faces-redirect=true";
         }
+        
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, resultado, "Uno o más datos inválidos"));
-        logger.exiting(this.getClass().getName(), "agregarTrasladoDigitador", "");
+
+        logger.exiting(this.getClass().getName(), "agregarTrasladoDigitador", "traslado no pudo ser creado");
+        //return "";
         return "";
     }
 
@@ -269,38 +320,6 @@ public class TodoMB {
 
     public void setIntercalado(List<Traslado> intercalado) {
         this.intercalado = intercalado;
-    }
-
-    public String getUsuarioEntrega() {
-        return usuarioEntrega;
-    }
-
-    public void setUsuarioEntrega(String usuarioEntrega) {
-        this.usuarioEntrega = usuarioEntrega;
-    }
-
-    public String getUsuarioEntregaUnidad() {
-        return usuarioEntregaUnidad;
-    }
-
-    public void setUsuarioEntregaUnidad(String usuarioEntregaUnidad) {
-        this.usuarioEntregaUnidad = usuarioEntregaUnidad;
-    }
-
-    public String getUsuarioEntregaCargo() {
-        return usuarioEntregaCargo;
-    }
-
-    public void setUsuarioEntregaCargo(String usuarioEntregaCargo) {
-        this.usuarioEntregaCargo = usuarioEntregaCargo;
-    }
-
-    public String getUsuarioEntregaRut() {
-        return usuarioEntregaRut;
-    }
-
-    public void setUsuarioEntregaRut(String usuarioEntregaRut) {
-        this.usuarioEntregaRut = usuarioEntregaRut;
     }
 
     public String getUsuarioRecibe() {

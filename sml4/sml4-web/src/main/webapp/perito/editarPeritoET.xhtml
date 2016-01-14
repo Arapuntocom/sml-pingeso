@@ -32,9 +32,9 @@
                     <h:form> 
                         <ul class="nav nav-tabs nav-justified">
 
-                            <li role="presentation"><a href="peritoFormulario.xhtml">Iniciar Cadena de Custodia</a></li> 
+                            <li role="presentation"><h:commandLink id="cs2" action="#{editarPeritoETMB.iniciarCadena()}" value="Iniciar cadena de custodia"></h:commandLink></li> 
                             
-                            <li role="presentation" class="active"><a href="buscadorPerito.xhtml">Buscar Cadena de Custodia</a></li>  
+                            <li role="presentation" class="active"><h:commandLink id="cs1" action="#{editarPeritoETMB.buscar()}" value="Buscar"></h:commandLink></li>  
 
                             <li role="presentation"> <h:commandLink id="cs" action="#{editarPeritoETMB.salir()}" value="Cerrar sesión"></h:commandLink> </li>
 
@@ -109,9 +109,6 @@
                                         <h:outputLabel  for="obs" value="Observaciones:" style="width:120px"></h:outputLabel>
                                         <p:inputTextarea id="Observaciones" rows="3" cols="90" value="#{editarPeritoETMB.formulario.observaciones}" queryDelay="750" minQueryLength="4" disabled="true" />
 
-                                        <h:outputLabel for="evi" value="Evidencia:" style="width:120px"/>
-                                        <p:inputText id="evi" value="#{editarPeritoETMB.evidencia}" label="Evidencia" disabled="true"></p:inputText>    
-                                        
                                         <h:outputLabel  for="des" value="Descripción:" style="width:120px"></h:outputLabel>
                                         <p:inputTextarea id="descripcion" rows="3" cols="90" value="#{editarPeritoETMB.formulario.descripcionEspecieFormulario}" queryDelay="750" minQueryLength="4" disabled="true" />
                                     </h:panelGrid>  <br />

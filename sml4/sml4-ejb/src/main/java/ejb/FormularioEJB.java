@@ -226,10 +226,7 @@ public class FormularioEJB implements FormularioEJBLocal {
                 logger.exiting(this.getClass().getName(), "crearTraslado", "Error con creacion usuario Recibe");
                 return "Error con datos de la persona que recibe.";
             }
-        } else if (!usuarioRecibeP.getNombreUsuario().equals(usuarioRecibe) || !usuarioRecibeP.getCargoidCargo().getNombreCargo().equals(usuarioRecibeCargo)) {
-            logger.exiting(this.getClass().getName(), "crearTraslado", "Error con verificacion usuario Recibe");
-            return "Datos no corresponden al rut";
-        }
+        } 
 
         //verificando que usuario recibe sea distinto del usuario que entrega
         if (usuarioEntregaP.equals(usuarioRecibeP)) { //si se trata del mismo usuario
@@ -242,9 +239,12 @@ public class FormularioEJB implements FormularioEJBLocal {
         ultimoTraslado.setFechaEntrega(fechaT);
         ultimoTraslado.setObservaciones(observaciones);
         ultimoTraslado.setUsuarioidUsuarioRecibe(usuarioRecibeP);
+        
+        System.out.println(" !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! MOTIVO ULTIMO TRASLADO "+ultimoTraslado.getTipoMotivoidMotivo().getTipoMotivo());
 
         //verificamos si el traslado se trata de un peritaje, lo cual pone al formulario en amarillo (y no se debe crear un siguiente traslado).
-        if (ultimoTraslado.getTipoMotivoidMotivo().getTipoMotivo().equals("Peritaje")) {
+        //ultimoTraslado.getTipoMotivoidMotivo().getTipoMotivo()
+        if (motivoNext.equals("Peritaje")) {
             Semaforo semAmarillo = semaforoFacade.findByColor("Amarillo");
             if (semAmarillo == null) {
                 logger.exiting(this.getClass().getName(), "crearTraslado", "No se encontro semaforo Amarillo");
@@ -394,7 +394,7 @@ public class FormularioEJB implements FormularioEJBLocal {
     //Función que crea el formulario
     // el String de retorno se muentra como mensaje en la vista.
     @Override
-    public String crearFormulario(String codEvidencia, String evidencia, String motivo, String ruc, String rit, int nue, int nParte, String cargo, String delito, String direccionSS, String lugar, String unidad, String levantadoPor, String rut, Date fecha, String observacion, String descripcion, Usuario digitador) {
+    public String crearFormulario(String motivo, String ruc, String rit, int nue, int nParte, String cargo, String delito, String direccionSS, String lugar, String unidad, String levantadoPor, String rut, Date fecha, String observacion, String descripcion, Usuario digitador) {
 
         //Verificando nue
         if (nue > 0) {
@@ -476,61 +476,12 @@ public class FormularioEJB implements FormularioEJBLocal {
         nuevoFormulario.setBloqueado(false);
         nuevoFormulario.setSemaforoidSemaforo(estadoInicial);
 
-        //---- match evidencia
-        String nombreArea = null;
-        int areaEvidencia = Integer.parseInt(codEvidencia); //confiemos en que no habra problema al parsear.
-        if (areaEvidencia >= 1 && areaEvidencia <= 4) {//clinica 1-2-3-4 ->  Clínica SML  
-            nombreArea = "Clínica SML";
-        }
-        if (areaEvidencia >= 5 && areaEvidencia <= 9) { //tanatologia 5-6-7-8-9 -> Tanatología SML
-            nombreArea = "Tanatología SML";
-        }
-        Area areaEvid = areaFacade.findByArea(nombreArea);
-        if (areaEvid == null) {
-            logger.exiting(this.getClass().getName(), "crearFormulario", "problema al cargar el area de la evidencia");
-            return "Ocurrió un problema al cargar el área de la evidencia.";
-        }
 
-        String nombreTipoEvid = null;
-        if (areaEvidencia == 1 || areaEvidencia == 6) {
-            nombreTipoEvid = "Biológica";
-        }
-        if (areaEvidencia == 2 || areaEvidencia == 7) {
-            nombreTipoEvid = "Vestuario";
-        }
-        if (areaEvidencia == 3 || areaEvidencia == 8) {
-            nombreTipoEvid = "Artefacto";
-        }
-        if (areaEvidencia == 5) {
-            nombreTipoEvid = "Elemento balístico";
-        }
-        if (areaEvidencia == 4 || areaEvidencia == 9) {
-            nombreTipoEvid = "Otros";
-        }
-
-        TipoEvidencia tipoEvid = tipoEvidenciaFacade.findByNombreAndTipoEvidencia(nombreTipoEvid, areaEvid);
-         if(tipoEvid == null){
-            logger.exiting(this.getClass().getName(), "crearFormulario", "problema al cargar el tipo de evidencia");
-            return "Ocurrió un problema al cargar el tipo de evidencia.";
-        }
-        
-        Evidencia evidenciaP = evidenciaFacade.findByNombreAndTipoEvidencia(evidencia, tipoEvid);
-        if (evidenciaP == null) {
-            logger.exiting(this.getClass().getName(), "crearFormulario", "problema al cargar la evidencia");
-            return "Ocurrió un problema al cargar la evidencia.";
-        }
 
         logger.finest("se inicia la persistencia del nuevo formulario");
         formularioFacade.create(nuevoFormulario);
         logger.finest("se finaliza la persistencia del nuevo formulario");
 
-        //agregando la evidencia
-        FormularioEvidencia formEvid = new FormularioEvidencia();
-        formEvid.setEvidenciaidEvidencia(evidenciaP);
-        formEvid.setFormularioNUE(nuevoFormulario);
-        logger.finest("se inicia la persistencia de formularioEvidencia");
-        formularioEvidenciaFacade.create(formEvid);
-        logger.finest("se finaliza la persistencia de formularioEvidencia");
 
         //creando primer traslado
         Traslado primerTraslado = new Traslado();
@@ -547,11 +498,11 @@ public class FormularioEJB implements FormularioEJBLocal {
     }
 
     //se crea una nueva edicion para el formulario indicado.
-    @Override
+    /*@Override
     public String edicionFormulario(Formulario formulario, String obsEdicion, Usuario usuarioSesion) {
         logger.setLevel(Level.ALL);
         logger.entering(this.getClass().getName(), "edicionFormulario");
-        if (obsEdicion == null) {
+        if (obsEdicion == null && obsEdicion.equals("")) {
             logger.exiting(this.getClass().getName(), "edicionFormulario", "falta observación.");
             return "Se requiere la observación.";
         }
@@ -579,6 +530,7 @@ public class FormularioEJB implements FormularioEJBLocal {
         logger.exiting(this.getClass().getName(), "edicionFormulario", "Exito");
         return "Exito";
     }
+*/
 
     //se crea una nueva edicion para el formulario indicado.
     //modificado Ara
@@ -591,6 +543,11 @@ public class FormularioEJB implements FormularioEJBLocal {
         System.out.println("EJB parte " + parte);
         System.out.println("EJB obs " + obsEdicion);
 
+        if (!esParticipanteCC(formulario, usuarioSesion)) {
+            logger.exiting(this.getClass().getName(), "edicionFormulario", "usuario no ha participado en cc");
+            return "Usted no ha participado en esta cadena de custodia.";
+        }
+        
         if (obsEdicion.equals("") && parte == 0 && ruc == null && rit == null) { //si no viene ningún campo, al menos se necesita observacion
             logger.exiting(this.getClass().getName(), "edicionFormulario", "requiere observacion");
             return "Se requiere observación.";

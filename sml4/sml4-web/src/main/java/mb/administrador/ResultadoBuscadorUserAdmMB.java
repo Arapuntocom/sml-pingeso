@@ -45,6 +45,7 @@ public class ResultadoBuscadorUserAdmMB {
 
     private String rut;
     private Usuario usuarioBuscado;
+    private String estadoUsuarioEspanol;
 
     private static final Logger logger = Logger.getLogger(ResultadoBuscadorUserJefeaAreaMB.class.getName());
 
@@ -78,47 +79,58 @@ public class ResultadoBuscadorUserAdmMB {
         logger.entering(this.getClass().getName(), "CargarDatosADM");
         this.usuarioSesion = usuarioEJB.findUsuarioSesionByCuenta(this.userSesion);
         this.usuarioBuscado = usuarioEJB.findUserByRut(this.rut);
+        latino();
         logger.log(Level.INFO, "Nombre usuario {0}", this.usuarioBuscado.getNombreUsuario());
         logger.log(Level.FINEST, "Rut usuario {0}", this.usuarioBuscado.getRutUsuario());
         logger.exiting(this.getClass().getName(), "CargarDatosADM");
     }
 
+    private void latino(){
+    boolean estado = this.usuarioBuscado.getEstadoUsuario();
+        if(estado)
+            estadoUsuarioEspanol = "Habilitado";
+        else
+            estadoUsuarioEspanol = "Deshabilitado";
+    }
+    
     public String habilitarUsuario() {
         logger.setLevel(Level.ALL);
-        logger.entering(this.getClass().getName(), "habilitarUsuarioADM");
+        logger.entering(this.getClass().getName(), "habilitarUsuario");
         boolean response = usuarioEJB.edicionEstadoUsuario(this.rut, "Activo");
 
         if (response == true) {
             httpServletRequest.getSession().setAttribute("rut", this.rut);
             httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.userSesion);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Usuario ha sido habilitado correctamente", ""));
-            logger.exiting(this.getClass().getName(), "habilitarUsuarioADM", "buscadorJefeAreaResultUsuario");
-            return "";
+            logger.exiting(this.getClass().getName(), "habilitarUsuario", "buscadorJefeAreaResultUsuario");
+            latino();
+            return "buscadorAdmResultUsuario.xhtml?faces-redirect=true";
+            //return "";
         }
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Usuario ya se encuentra habilitado", ""));
         logger.info("Usuario ya se encuentra habilitado");
-        logger.exiting(this.getClass().getName(), "habilitarUsuarioADM", "habilitarUsuario");
+        logger.exiting(this.getClass().getName(), "habilitarUsuario", "habilitarUsuario");
 
         return "";
     }
 
     public String deshabilitarUsuario() {
         logger.setLevel(Level.ALL);
-        logger.entering(this.getClass().getName(), "deshabilitarUsuarioADM");
+        logger.entering(this.getClass().getName(), "deshabilitarUsuario");
         boolean response = usuarioEJB.edicionEstadoUsuario(this.rut, "Inactivo");
         if (response == true) {
             httpServletRequest.getSession().setAttribute("rut", this.rut);
             httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.userSesion);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Usuario ha sido deshabilitado correctamente", ""));
-            logger.exiting(this.getClass().getName(), "deshabilitarUsuarioADM", "buscadorJefeAreaResultUsuario");
-            return "";
+            logger.exiting(this.getClass().getName(), "deshabilitarUsuario", "buscadorJefeAreaResultUsuario");
+            return "buscadorAdmResultUsuario.xhtml?faces-redirect=true";
+           // return "";
         }
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Usuario ya se encuentra deshabilitado", ""));
         logger.info("Usuario ya se encuentra deshabilitado");
-        logger.exiting(this.getClass().getName(), "deshabilitarUsuarioADM", "deshabilitarUsuario");
+        logger.exiting(this.getClass().getName(), "deshabilitarUsuario", "deshabilitarUsuario");
         return "";
     }
-
     //retorna a la vista para realizar busqueda
     public String buscador() {
         logger.setLevel(Level.ALL);
@@ -180,6 +192,14 @@ public class ResultadoBuscadorUserAdmMB {
 
     public void setUsuarioBuscado(Usuario usuarioBuscado) {
         this.usuarioBuscado = usuarioBuscado;
+    }
+
+    public String getEstadoUsuarioEspanol() {
+        return estadoUsuarioEspanol;
+    }
+
+    public void setEstadoUsuarioEspanol(String estadoUsuarioEspanol) {
+        this.estadoUsuarioEspanol = estadoUsuarioEspanol;
     }
     
     

@@ -32,4 +32,8 @@ public interface ValidacionEJBLocal {
     boolean validarCuentaUsuario(String cuentaUsuario);
     
     boolean validarPassUsuario(String passUsuario);
+    
+    boolean correoExiste(String email);
+    
+    public boolean rutExiste(String rut);
 }

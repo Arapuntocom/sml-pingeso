@@ -27,7 +27,7 @@ public class ValidacionEJB implements ValidacionEJBLocal {
     private FormularioFacadeLocal formularioFacade;
 
     @EJB
-    private UsuarioFacadeLocal usuarioFacade;     
+    private UsuarioFacadeLocal usuarioFacade;
 
     static final Logger logger = Logger.getLogger(ValidacionEJB.class.getName());
 
@@ -38,6 +38,8 @@ public class ValidacionEJB implements ValidacionEJBLocal {
         if (fechaT != null && fechaFormulario != null) {
             Date dateTraslado = fechaT;
             Date dateFormulario = fechaFormulario;
+
+            Date fechaActual = new Date();
             if (dateTraslado.equals(dateFormulario) || dateTraslado.after(dateFormulario)) {
                 logger.exiting(this.getClass().getName(), "compareFechas", true);
                 return true;
@@ -96,7 +98,7 @@ public class ValidacionEJB implements ValidacionEJBLocal {
     @Override
     public boolean soloCaracteres(String palabra) {
 
-        Pattern patron = Pattern.compile("/^[a-zA-Z áéíóúAÉÍÓÚÑñ]+$/");
+        Pattern patron = Pattern.compile("[^A-Za-z ]");
         Matcher encaja = patron.matcher(palabra);
 
         if (!encaja.find()) {
@@ -108,7 +110,7 @@ public class ValidacionEJB implements ValidacionEJBLocal {
         }
 
     }
-    
+
     @Override
     //Función que verifica el ruc y el rit, solamente entrega true en los siguientes casos (513-21321) y ().
     public boolean checkRucOrRit(String rucOrRit) {
@@ -155,7 +157,7 @@ public class ValidacionEJB implements ValidacionEJBLocal {
             return false;
         }
         return true;
-    }   
+    }
 
     //Funcion para validar el email
     //Retorna true en el caso que sea valido
@@ -169,7 +171,15 @@ public class ValidacionEJB implements ValidacionEJBLocal {
         // Match the given input against this pattern
         Matcher matcher = pattern.matcher(email);
         return matcher.matches();
+    }
 
+    @Override
+    public boolean correoExiste(String email) {
+        Usuario usuario = usuarioFacade.findByEmail(email);
+        if (usuario != null) {
+            return true;
+        }
+        return false;
     }
 
     //Función para verificar la existencia del usuario en el sistema
@@ -184,7 +194,7 @@ public class ValidacionEJB implements ValidacionEJBLocal {
         //Si lo encuentro verifico si la contraseña es igual a la que se ingreso
         if (foundUser != null) {
             if (foundUser.getPassUsuario().equals(pass)) {
-                if(!foundUser.getEstadoUsuario()){
+                if (!foundUser.getEstadoUsuario()) {
                     return "off";
                 }
                 //Redirecciono según el cargo a su respectiva vista
@@ -194,12 +204,12 @@ public class ValidacionEJB implements ValidacionEJBLocal {
                     direccion = "/chofer/choferFormulario.xhtml?faces-redirect=true";
                 } else if (foundUser.getCargoidCargo().getNombreCargo().equals("Digitador")) {
                     direccion = "/digitador/digitadorFormularioHU11.xhtml?faces-redirect=true";
-                } else if (foundUser.getCargoidCargo().getNombreCargo().equals("Técnico")) {
-                    direccion = "/perito/buscadorPerito.xhtml?faces-redirect=true";
-                } else if (foundUser.getCargoidCargo().getNombreCargo().equals("Jefe de área")) {
+                } else if (foundUser.getCargoidCargo().getNombreCargo().equals("Tecnico")) {
+                     direccion = "/perito/peritoFormulario.xhtml?faces-redirect=true";
+                } else if (foundUser.getCargoidCargo().getNombreCargo().equals("Jefe de area")) {
                     direccion = "/jefeArea/buscadorJefeArea.xhtml?faces-redirect=true";
-                } else if(foundUser.getCargoidCargo().getNombreCargo().equals("Administrativo")) {
-                    direccion = "/administrador/buscadorAdministrador.xhtml?faces-redirect=true";                
+                } else if (foundUser.getCargoidCargo().getNombreCargo().equals("Administrativo")) {
+                    direccion = "/administrador/buscadorAdministrador.xhtml?faces-redirect=true";
                 }
             }
         }
@@ -210,9 +220,14 @@ public class ValidacionEJB implements ValidacionEJBLocal {
     //minimo 8 caracteres
     @Override
     public boolean validarCuentaUsuario(String cuentaUsuario) {
-
+        /*
         int largo = cuentaUsuario.length();
         if (largo < 8) {
+            return false;
+        }*/
+        //ojo, cuidado con un posible null exception con el parametro recibido
+        Usuario existe = usuarioFacade.findByCuentaUsuario(cuentaUsuario);
+        if (existe != null) {
             return false;
         }
         return true;
@@ -220,7 +235,7 @@ public class ValidacionEJB implements ValidacionEJBLocal {
 
     @Override
     public boolean validarPassUsuario(String passUsuario) {
-
+        //ojo, cuidado con un posible null exception con el parametro recibido
         int largo = passUsuario.length();
         if (largo < 8) {
             return false;
@@ -228,4 +243,13 @@ public class ValidacionEJB implements ValidacionEJBLocal {
         return true;
     }
 
+    @Override
+    public boolean rutExiste(String rut) {
+        //ojo, cuidado con un posible null exception con el parametro recibido
+        Usuario existe = usuarioFacade.findByRUN(rut);
+        if (existe != null) {
+            return true;
+        }
+        return false;
+    }
 }

@@ -22,6 +22,7 @@ import javax.ejb.EJB;
 import javax.inject.Named;
 import javax.enterprise.context.RequestScoped;
 import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 
@@ -31,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Named(value = "editarChoferETMB")
 @RequestScoped
+@ManagedBean
 public class EditarChoferETMB {
 
     @EJB
@@ -60,8 +62,6 @@ public class EditarChoferETMB {
     private List<EdicionFormulario> edicionesList;
     private List<Traslado> trasladosList;
 
-    private List<FormularioEvidencia> evidenciasList;
-    private String evidencia;
 
     //para habilitar la edicion de estos campos.
     private boolean isRit;
@@ -88,7 +88,6 @@ public class EditarChoferETMB {
 
         this.edicionesList = new ArrayList();
         this.trasladosList = new ArrayList();
-        this.evidenciasList = new ArrayList<>();
         this.intercalado = new ArrayList<>();
 
         this.facesContext1 = FacesContext.getCurrentInstance();
@@ -122,7 +121,6 @@ public class EditarChoferETMB {
         this.usuarioSesion = usuarioEJB.findUsuarioSesionByCuenta(usuarioS);
         this.trasladosList = formularioEJB.traslados(formulario);
         this.edicionesList = formularioEJB.listaEdiciones(this.nue);
-        this.evidenciasList = formularioEJB.findEvidenciaFormularioByFormulario(formulario);
 
         if (formulario.getNumeroParte() == 0) {
             this.isParte = false;
@@ -134,11 +132,6 @@ public class EditarChoferETMB {
             this.isRit = false;
         }
 
-        this.evidenciasList = formularioEJB.findEvidenciaFormularioByFormulario(formulario);
-        if (!evidenciasList.isEmpty()) {
-            this.evidencia = evidenciasList.get(0).getEvidenciaidEvidencia().getNombreEvidencia();
-        }
-        System.out.println("EVIDENCIA! " + evidencia);
 
         intercalado(trasladosList);
 
@@ -153,6 +146,7 @@ public class EditarChoferETMB {
         if (this.isParte == false && formulario.getNumeroParte() != 0) {
             parte = formulario.getNumeroParte();
             logger.log(Level.INFO, "MB parte -> {0}", parte);
+     
             String mensaje = validacionVistasMensajesEJB.checkParte(formulario.getNumeroParte());
             if (mensaje.equals("Exito")) {
                 isParte = true;
@@ -319,23 +313,7 @@ public class EditarChoferETMB {
     public void setTrasladosList(List<Traslado> trasladosList) {
         this.trasladosList = trasladosList;
     }
-
-    public List<FormularioEvidencia> getEvidenciasList() {
-        return evidenciasList;
-    }
-
-    public void setEvidenciasList(List<FormularioEvidencia> evidenciasList) {
-        this.evidenciasList = evidenciasList;
-    }
-
-    public String getEvidencia() {
-        return evidencia;
-    }
-
-    public void setEvidencia(String evidencia) {
-        this.evidencia = evidencia;
-    }
-
+    
     public int getParte() {
         return parte;
     }

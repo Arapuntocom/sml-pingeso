@@ -45,8 +45,7 @@
                 <div class="col-md-9"> <!-- Barra de navegación -->
                     <h:form>
                         <ul class="nav nav-tabs nav-justified">
-                            <li role="presentation" class="active"><a href="#">Cadena de Custodia</a></li>
-                            <li role="presentation"><a href="digitadorFormularioHU11.xhtml">Nueva Cadena de Custodia</a></li>                        
+                            <li role="presentation" class="active" > <h:commandLink id="cs1" action="#{forTrasladoMB.nuevaCadena()}" value="Nueva cadena de custodia"></h:commandLink></li>                        
                             <li role="presentation"> <h:commandLink id="cs" action="#{forTrasladoMB.salir()}" value="Cerrar sesión"></h:commandLink> </li>                    
                         </ul>
                     </h:form>
@@ -127,9 +126,10 @@
                                     <h:outputLabel  for="obs" value="Observaciones:" style="width:120px"></h:outputLabel>
                                     <p:inputTextarea id="Observaciones" rows="3" cols="90" value="#{forTrasladoMB.formulario.observaciones}" queryDelay="750" minQueryLength="4" disabled="true" />
 
-
+                                    <!--
                                     <h:outputLabel for="evi" value="Evidencia:" style="width:120px"/>
-                                    <p:inputText id="evi" value="#{forTrasladoMB.evidencia}" label="Evidencia" disabled="true"></p:inputText>    
+                                    <p:inputText id="evi" value="" label="Evidencia" disabled="true"></p:inputText>  
+                                    -->
 
                                     <h:outputLabel  for="des" value="Descripción:" style="width:120px"></h:outputLabel>
                                     <p:inputTextarea id="descripcion" rows="3" cols="90" value="#{forTrasladoMB.formulario.descripcionEspecieFormulario}" disabled="true" queryDelay="750" minQueryLength="4" />
@@ -141,7 +141,7 @@
                                 <div align="center">
                                     <h:panelGrid columns="5" cellpadding="5" class="ui-grid">
                                         <h:outputLabel  style="width:120px" for="fech" value="Fecha*:"></h:outputLabel> <!-- nose si poner la misma etiqueta -->
-                                        <p:calendar id="fech" pattern="dd/MM/yyyy HH:mm" locale="es" value="#{forTrasladoMB.fechaT}" required="true" requiredMessage="Debe ingresar la fecha"/>                                    
+                                        <p:calendar id="fech" pattern="dd/MM/yyyy HH:mm" locale="es" value="#{forTrasladoMB.formulario.fechaOcurrido}" disabled ="true"/>                                    
                                         <p:message for="fech" display="text"/>
                                     </h:panelGrid>
                                     <br />
@@ -210,8 +210,8 @@
                                         <f:selectItem itemValue="Laboratorio SML" itemLabel="Laboratorio SML"/>
                                         <f:selectItem itemValue="LACRIM" itemLabel="LACRIM"/>
                                         <f:selectItem itemValue="LABOCAR" itemLabel="LABOCAR"/>
-                                        <f:selectItem itemValue="Tanatología SML" itemLabel="Tanatología SML"/>
-                                        <f:selectItem itemValue="Clínica SML" itemLabel="Clínica SML"/>
+                                        <f:selectItem itemValue="Tanatologia SML" itemLabel="Tanatología SML"/>
+                                        <f:selectItem itemValue="Clinica SML" itemLabel="Clínica SML"/>
                                         <f:selectItem itemValue="Otro" itemLabel="Otro"/>
                                     </h:selectOneMenu>
                                 </div>
@@ -220,7 +220,7 @@
                                 <h:outputLabel  for="cargo1" value="Cargo*: " style="width:120px"/>
                                 <h:selectOneMenu  id="cargo1" value="#{forTrasladoMB.usuarioRecibeCargo}" style="width:120px; pull-left" required="true" requiredMessage="Debe ingresar el cargo">
                                     <f:selectItem itemValue="0" itemLabel="Seleccione" noSelectionOption="true"/>
-                                    <f:selectItem itemValue="Técnico" itemLabel="Técnico"/>
+                                    <f:selectItem itemValue="Tecnico" itemLabel="Técnico"/>
                                     <f:selectItem itemValue="Perito" itemLabel="Perito"/>
                                     <f:selectItem itemValue="Chofer" itemLabel="Chofer"/>
                                     <f:selectItem itemValue="Otro" itemLabel="Otro"/>

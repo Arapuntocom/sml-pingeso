@@ -10,6 +10,7 @@ import entity.Evidencia;
 import entity.TipoEvidencia;
 import entity.Usuario;
 import static facade.AbstractFacade.logger;
+import java.util.List;
 import java.util.logging.Level;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -29,6 +30,7 @@ import javax.persistence.TransactionRequiredException;
  */
 @Stateless
 public class EvidenciaFacade extends AbstractFacade<Evidencia> implements EvidenciaFacadeLocal {
+
     @PersistenceContext(unitName = "com.pingeso_sml4-ejb_ejb_3.0-SNAPSHOTPU")
     private EntityManager em;
 
@@ -43,8 +45,8 @@ public class EvidenciaFacade extends AbstractFacade<Evidencia> implements Eviden
 
     // query creada por programador (ara)
     /*@NamedQuery(name = "Evidencia.findByNombreAndTipoEvidencia", 
-    query = "SELECT e FROM Evidencia e WHERE e.nombreEvidencia = :nombreEvidencia AND e.tipoEvidenciaidTipoEvidencia = :tipoEvidenciaidTipoEvidencia")
-*/
+     query = "SELECT e FROM Evidencia e WHERE e.nombreEvidencia = :nombreEvidencia AND e.tipoEvidenciaidTipoEvidencia = :tipoEvidenciaidTipoEvidencia")
+     */
     @Override
     public Evidencia findByNombreAndTipoEvidencia(String evidencia, TipoEvidencia tipoEvid) {
         logger.setLevel(Level.ALL);
@@ -89,5 +91,51 @@ public class EvidenciaFacade extends AbstractFacade<Evidencia> implements Eviden
             return retorno;
         }
     }
-    
+
+    @Override
+    public List<Evidencia> evidenciasT(TipoEvidencia tipoEvid) {
+        logger.setLevel(Level.ALL);
+        logger.entering(this.getClass().getName(), "evidenciasT");
+        List<Evidencia> retorno = null;
+        try {
+            Query q = em.createNamedQuery("Evidencia.findByTipoEvidencia", Evidencia.class).setParameter("tipoEvidenciaidTipoEvidencia", tipoEvid);
+            retorno =  q.getResultList();
+        } catch (IllegalArgumentException e) {
+            logger.severe("EvidenciaFacade: el nombre o el parametro de la Query no existe -> " + e);
+            retorno = null;
+        } catch (NoResultException e) {
+            logger.severe("EvidenciaFacade: No hay resultados -> " + e);
+            retorno = null;
+        } catch (NonUniqueResultException e) {
+            logger.severe("EvidenciaFacade: hay mas de un resulado -> " + e);
+            retorno = null;
+        } catch (IllegalStateException e) {
+            logger.severe("EvidenciaFacade: ocurrio un problema con la consulta -> " + e);
+            retorno = null;
+        } catch (QueryTimeoutException e) {
+            logger.severe("EvidenciaFacade: ocurrio un problema con la consulta -> " + e);
+            retorno = null;
+        } catch (TransactionRequiredException e) {
+            logger.severe("EvidenciaFacade: ocurrio un problema con la consulta -> " + e);
+            retorno = null;
+        } catch (PessimisticLockException e) {
+            logger.severe("EvidenciaFacade: ocurrio un problema con la consulta -> " + e);
+            retorno = null;
+        } catch (LockTimeoutException e) {
+            logger.severe("EvidenciaFacade: ocurrio un problema con la consulta -> " + e);
+            retorno = null;
+        } catch (PersistenceException e) {
+            logger.severe("EvidenciaFacade: ocurrio un problema con la consulta -> " + e);
+            retorno = null;
+        }
+        if (retorno == null) {
+            logger.exiting(this.getClass().getName(), "evidenciasT", null);
+            return null;
+        } else {
+            logger.exiting(this.getClass().getName(), "evidenciasT", retorno.toString());
+            return retorno;
+        }
+
+    }
+
 }

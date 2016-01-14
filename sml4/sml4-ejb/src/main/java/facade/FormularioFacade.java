@@ -6,6 +6,7 @@
 package facade;
 
 import entity.Formulario;
+import java.sql.Date;
 import java.util.List;
 import java.util.logging.Level;
 import javax.ejb.Stateless;
@@ -26,6 +27,7 @@ import javax.persistence.TransactionRequiredException;
  */
 @Stateless
 public class FormularioFacade extends AbstractFacade<Formulario> implements FormularioFacadeLocal {
+
     @PersistenceContext(unitName = "com.pingeso_sml4-ejb_ejb_3.0-SNAPSHOTPU")
     private EntityManager em;
 
@@ -37,7 +39,7 @@ public class FormularioFacade extends AbstractFacade<Formulario> implements Form
     public FormularioFacade() {
         super(Formulario.class);
     }
-    
+
     //@NamedQuery(name = "Formulario.findByNue", query = "SELECT f FROM Formulario f WHERE f.nue = :nue")
     @Override
     public Formulario findByNue(int nue) {
@@ -85,15 +87,15 @@ public class FormularioFacade extends AbstractFacade<Formulario> implements Form
             return retorno;
         }
     }
-    
-     @Override
+
+    @Override
     public List<Formulario> findByNParte(int nParte) {
         logger.setLevel(Level.ALL);
         logger.entering(this.getClass().getName(), "findByNParte", nParte);
         List<Formulario> retorno = null;
         try {
             Query q = em.createNamedQuery("Formulario.findByNumeroParte", Formulario.class).setParameter("numeroParte", nParte);
-            retorno =  q.getResultList();
+            retorno = q.getResultList();
             logger.log(Level.INFO, "buscar formulario by numero de parte -> {0}", nParte);
         } catch (IllegalArgumentException e) {
             logger.severe("FormularioFacade: el nombre o el parametro de la Query no existe -> " + e);
@@ -131,7 +133,7 @@ public class FormularioFacade extends AbstractFacade<Formulario> implements Form
             return retorno;
         }
     }
-    
+
     @Override
     public List<Formulario> findByRuc(String ruc) {
         logger.setLevel(Level.ALL);
@@ -139,7 +141,7 @@ public class FormularioFacade extends AbstractFacade<Formulario> implements Form
         List<Formulario> retorno = null;
         try {
             Query q = em.createNamedQuery("Formulario.findByRuc", Formulario.class).setParameter("ruc", ruc);
-            retorno =  q.getResultList();
+            retorno = q.getResultList();
             logger.log(Level.INFO, "buscar formulario by ruc -> {0}", ruc);
         } catch (IllegalArgumentException e) {
             logger.severe("FormularioFacade: el nombre o el parametro de la Query no existe -> " + e);
@@ -177,7 +179,7 @@ public class FormularioFacade extends AbstractFacade<Formulario> implements Form
             return retorno;
         }
     }
-    
+
     @Override
     public List<Formulario> findByRit(String rit) {
         logger.setLevel(Level.ALL);
@@ -185,7 +187,7 @@ public class FormularioFacade extends AbstractFacade<Formulario> implements Form
         List<Formulario> retorno = null;
         try {
             Query q = em.createNamedQuery("Formulario.findByRit", Formulario.class).setParameter("rit", rit);
-            retorno =  q.getResultList();
+            retorno = q.getResultList();
             logger.log(Level.INFO, "buscar formulario by rit -> {0}", rit);
         } catch (IllegalArgumentException e) {
             logger.severe("FormularioFacade: el nombre o el parametro de la Query no existe -> " + e);
@@ -223,5 +225,6 @@ public class FormularioFacade extends AbstractFacade<Formulario> implements Form
             return retorno;
         }
     }
-    
+
+
 }

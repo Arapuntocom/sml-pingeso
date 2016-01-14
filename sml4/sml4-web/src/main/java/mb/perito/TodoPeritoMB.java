@@ -8,7 +8,6 @@ package mb.perito;
 import ejb.FormularioEJBLocal;
 import ejb.UsuarioEJBLocal;
 import entity.EdicionFormulario;
-import entity.Evidencia;
 import entity.Formulario;
 import entity.FormularioEvidencia;
 import entity.Traslado;
@@ -25,6 +24,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
+import static mb.perito.CrearFormularioPeritoMB.logger;
 
 /**
  *
@@ -56,12 +56,10 @@ public class TodoPeritoMB {
     private List<Traslado> trasladosList;
     private List<EdicionFormulario> edicionesList;
 
-    private List<FormularioEvidencia> evidenciasList;
 
     private boolean bloqueada;
     private boolean editable;
 
-    private String evidencia;
 
     private int contador = 1;
 
@@ -76,7 +74,6 @@ public class TodoPeritoMB {
         logger.entering(this.getClass().getName(), "TodoPeritoMB");
         this.trasladosList = new ArrayList<>();
         this.edicionesList = new ArrayList<>();
-        this.evidenciasList = new ArrayList<>();
         this.intercalado = new ArrayList<>();
         facesContext = FacesContext.getCurrentInstance();
         httpServletRequest = (HttpServletRequest) facesContext.getExternalContext().getRequest();
@@ -104,11 +101,6 @@ public class TodoPeritoMB {
 
         this.edicionesList = formularioEJB.listaEdiciones(nue);
 
-        this.evidenciasList = formularioEJB.findEvidenciaFormularioByFormulario(formulario);
-        if (!evidenciasList.isEmpty()) {
-            this.evidencia = evidenciasList.get(0).getEvidenciaidEvidencia().getNombreEvidencia();
-        }
-        System.out.println("EVIDENCIA! " + evidencia);
 
         this.bloqueada = formulario.getBloqueado();
         this.editable = formularioEJB.esParticipanteCC(formulario, usuarioSesion);
@@ -124,6 +116,23 @@ public class TodoPeritoMB {
         logger.exiting(this.getClass().getName(), "cargarDatosPerito");
     }
 
+       
+     //redirecciona a la pagina para realizar una busqueda
+    public String buscar() {
+        logger.entering(this.getClass().getName(), "buscar");
+        httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.usuarioSis);
+        logger.exiting(this.getClass().getName(), "buscar", "buscadorPerito");
+        return "buscadorPerito?faces-redirect=true";
+    }
+
+    //redirecciona a la pagina para iniciar cadena de custodia
+    public String iniciarCadena() {
+        logger.entering(this.getClass().getName(), "iniciarCadena");
+        httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.usuarioSis);
+        logger.exiting(this.getClass().getName(), "iniciarCadena", "peritoFormulario");
+        return "peritoFormulario?faces-redirect=true";
+    }
+    
     public String salir() {
         logger.setLevel(Level.ALL);
         logger.entering(this.getClass().getName(), "salirPerito");
@@ -226,22 +235,6 @@ public class TodoPeritoMB {
 
     public void setIntercalado(List<Traslado> intercalado) {
         this.intercalado = intercalado;
-    }
-
-    public String getEvidencia() {
-        return evidencia;
-    }
-
-    public void setEvidencia(String evidencia) {
-        this.evidencia = evidencia;
-    }
-
-    public List<FormularioEvidencia> getEvidenciasList() {
-        return evidenciasList;
-    }
-
-    public void setEvidenciasList(List<FormularioEvidencia> evidenciasList) {
-        this.evidenciasList = evidenciasList;
     }
 
     public List<EdicionFormulario> getEdicionesList() {

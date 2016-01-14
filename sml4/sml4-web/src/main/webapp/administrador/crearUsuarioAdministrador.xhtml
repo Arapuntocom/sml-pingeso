@@ -70,26 +70,29 @@
                                 <h:form>
                                     <br />
                                     <div align="center">
-                                        <h:panelGrid columns="4" cellpadding="5" class="ui-grid">
+                                        <h:panelGrid columns="3" cellpadding="5" class="ui-grid">
 
                                             <p:outputLabel for="CuentaUsuario" value="Cuenta:" style="width:90px"></p:outputLabel>
                                             <h:inputText id="CuentaUsuario" style="margin-right:10px" value = "#{crearUsuarioAdministradorMB.cuentaUsuario}" rendered="true" requiredMessage="Debe ingresar el nombre de la cuenta"/>
-
+                                            <hr/>
                                             <p:outputLabel for="Pass" value="Contraseña:" style="width:90px"></p:outputLabel>
-                                            <h:inputText id="Pass" style="margin-right:10px" value = "#{crearUsuarioAdministradorMB.pass}" rendered="true" requiredMessage="Debe ingresar la contraseña"/>
-
+                                            <h:inputSecret id="Pass"  style="margin-right:10px" value = "#{crearUsuarioAdministradorMB.pass}" rendered="true" requiredMessage="Debe ingresar la contraseña"/>
+                                            <hr/>
+                                            <p:outputLabel for="Pass2" value="Repita contraseña:" style="width:90px"></p:outputLabel>
+                                            <h:inputSecret id="Pass2"  style="margin-right:10px" value = "#{crearUsuarioAdministradorMB.pass2}" rendered="true" requiredMessage="Debe ingresar la contraseña"/>
+                                            <hr/>
                                             <p:outputLabel for="Nombre" value="Nombre:" style="width:90px"></p:outputLabel>
                                             <h:inputText id="Nombre" style="margin-right:10px" value = "#{crearUsuarioAdministradorMB.nombreUsuario}" rendered="true" requiredMessage="Debe ingresar el nombre"/>
-
+                                            <hr/>
                                             <p:outputLabel for="Apellido" value="Apellido:" style="width:90px"></p:outputLabel>
                                             <h:inputText id="Apellido" style="margin-right:10px" value = "#{crearUsuarioAdministradorMB.apellidoUsuario}" rendered="true" requiredMessage="Debe ingresar el apellido"/>
-
+                                            <hr/>
                                             <p:outputLabel for="Run" value="R.U.N:" style="width:90px"></p:outputLabel>
                                             <h:inputText id="Run" style="margin-right:10px" value = "#{crearUsuarioAdministradorMB.rut}" rendered="true" requiredMessage="Debe ingresar el R.U.N."/>
-
+                                            <hr/>
                                             <p:outputLabel for="Mail" value="Correo:" style="width:90px"></p:outputLabel>
                                             <h:inputText id="Mail" style="margin-right:10px" value = "#{crearUsuarioAdministradorMB.mail}" rendered="true" requiredMessage="Debe ingresar el correo del usuario"/>
-
+                                            <hr/>
                                         </h:panelGrid>
                                         <br />
 
@@ -98,6 +101,7 @@
                                             <p:outputLabel for="Cargo" value="Cargo: " style="width:90px"/>
                                             <!-- necesito una lista de cargos -->
                                             <p:selectOneMenu id="Cargo" value="#{crearUsuarioAdministradorMB.cargo}" style="width:150px">
+                                                <f:selectItem itemLabel="Seleccione" noSelectionOption="true"></f:selectItem>
                                                 <f:selectItems value="#{crearUsuarioAdministradorMB.cargos}" var="cargo" itemLabel="#{cargo}" itemValue="#{cargo}"/>
                                             </p:selectOneMenu>
 
@@ -110,7 +114,7 @@
                                             <p:outputLabel for="Area" value="Área: " style="width:90px"/>
                                             <!-- necesito una lista de cargos -->
                                             <p:selectOneMenu id="Area" value="#{crearUsuarioAdministradorMB.area}" style="width:150px">
-
+                                                <f:selectItem itemLabel="Seleccione" noSelectionOption="true"></f:selectItem>
                                                 <f:selectItems value="#{crearUsuarioAdministradorMB.areas}" var="area" itemLabel="#{area}" itemValue="#{area}"/>
 
                                             </p:selectOneMenu>

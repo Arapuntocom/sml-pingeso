@@ -26,6 +26,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
+import static mb.perito.CrearFormularioPeritoMB.logger;
 
 /**
  *
@@ -63,8 +64,6 @@ public class EditarPeritoETMB {
     private List<EdicionFormulario> edicionesList;
     private List<Traslado> trasladosList;
     
-    private List<FormularioEvidencia> evidenciasList;
-     private String evidencia;
     //para deshabilitar la edicion de estos campos.
     private boolean isRit;
     private boolean isRuc;
@@ -90,7 +89,6 @@ public class EditarPeritoETMB {
         /**/
         this.edicionesList = new ArrayList();
         this.trasladosList = new ArrayList();
-        this.evidenciasList = new ArrayList<>();
         this.intercalado = new ArrayList<>();
         this.facesContext1 = FacesContext.getCurrentInstance();
         this.httpServletRequest1 = (HttpServletRequest) facesContext1.getExternalContext().getRequest();
@@ -124,7 +122,6 @@ public class EditarPeritoETMB {
         this.usuarioSesion = usuarioEJB.findUsuarioSesionByCuenta(usuarioS);
         this.trasladosList = formularioEJB.traslados(formulario);
         this.edicionesList = formularioEJB.listaEdiciones(this.nue);
-        this.evidenciasList = formularioEJB.findEvidenciaFormularioByFormulario(formulario);
         
         if (formulario.getNumeroParte() == 0) {
             this.isParte = false;
@@ -135,12 +132,7 @@ public class EditarPeritoETMB {
         if (formulario.getRit() == null || formulario.getRit().equals("")) {
             this.isRit = false;
         }
-        
-        this.evidenciasList = formularioEJB.findEvidenciaFormularioByFormulario(formulario);
-        if(!evidenciasList.isEmpty())
-            this.evidencia = evidenciasList.get(0).getEvidenciaidEvidencia().getNombreEvidencia();
-        System.out.println("EVIDENCIA! "+evidencia);
-        
+
          intercalado(trasladosList);
         
         logger.exiting(this.getClass().getName(), "cargarDatosPerito");
@@ -200,18 +192,34 @@ public class EditarPeritoETMB {
         }
         
         //FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ocurrió un problema al guardar los cambios, por favor intente más tarde.", "error al editar"));
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, response, "error al editar"));
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, response, ""));
         logger.exiting(this.getClass().getName(), "editarFormularioPerito", "");
         return "";
     }
 
+     //redirecciona a la pagina para realizar una busqueda
+    public String buscar() {
+        logger.entering(this.getClass().getName(), "buscar");
+        httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.usuarioS);
+        logger.exiting(this.getClass().getName(), "buscar", "buscadorPerito");
+        return "buscadorPerito?faces-redirect=true";
+    }
+
+    //redirecciona a la pagina para iniciar cadena de custodia
+    public String iniciarCadena() {
+        logger.entering(this.getClass().getName(), "iniciarCadena");
+        httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.usuarioS);
+        logger.exiting(this.getClass().getName(), "iniciarCadena", "peritoFormulario");
+        return "peritoFormulario?faces-redirect=true";
+    }
+    
     public String salir() {
         logger.setLevel(Level.ALL);
         logger.entering(this.getClass().getName(), "salirPerito");
         logger.log(Level.FINEST, "usuario saliente {0}", this.usuarioSesion.getNombreUsuario());
         httpServletRequest1.removeAttribute("cuentaUsuario");
         logger.exiting(this.getClass().getName(), "salirPerito", "/indexListo");
-        return "/indexListo.xhtml?faces-redirect=true";
+        return "/indexListo?faces-redirect=true";
     }
     
     public void validarRuc(){
@@ -279,22 +287,6 @@ public class EditarPeritoETMB {
     public void setIntercalado(List<Traslado> intercalado) {
         this.intercalado = intercalado;
     }
-
-    public String getEvidencia() {
-        return evidencia;
-    }
-
-    public void setEvidencia(String evidencia) {
-        this.evidencia = evidencia;
-    }
-
-    public List<FormularioEvidencia> getEvidenciasList() {
-        return evidenciasList;
-    }
-
-    public void setEvidenciasList(List<FormularioEvidencia> evidenciasList) {
-        this.evidenciasList = evidenciasList;
-    }   
 
     public int getNue() {
         return nue;
@@ -366,6 +358,30 @@ public class EditarPeritoETMB {
 
     public void setIsParte(boolean isParte) {
         this.isParte = isParte;
+    }
+
+    public int getParte() {
+        return parte;
+    }
+
+    public void setParte(int parte) {
+        this.parte = parte;
+    }
+
+    public String getRuc() {
+        return ruc;
+    }
+
+    public void setRuc(String ruc) {
+        this.ruc = ruc;
+    }
+
+    public String getRit() {
+        return rit;
+    }
+
+    public void setRit(String rit) {
+        this.rit = rit;
     }
 
     

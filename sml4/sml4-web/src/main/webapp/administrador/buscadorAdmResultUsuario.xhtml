@@ -14,7 +14,7 @@
         <div class="container">
             <h:form>
                 <div class="thumbnail">
-                    <div align="center"><h:outputLabel class="input-group-lg" style=" background-color: white" value="Bienvenido(a) #{resultadoBuscadorUserAdmMB.usuarioSesion.nombreUsuario} #{resultadoBuscadorUserAdmMB.usuarioSesion.apellidoUsuario}"></h:outputLabel></div>
+                    <div align="center"><h:outputLabel class="input-group-lg" style=" background-color: white" value="Bienvenido(a) #{resultadoBuscadorUserAdmMB.usuarioSesion.nombreUsuario}  #{resultadoBuscadorUserAdmMB.usuarioSesion.apellidoUsuario}"></h:outputLabel></div>
                 </div>
             </h:form>
  
@@ -33,7 +33,7 @@
                             <li role="presentation" class="active" > <h:commandLink id="cs1" action="#{resultadoBuscadorUserAdmMB.buscador()}" value="Buscar"></h:commandLink> </li>  
  
                             <li role="presentation"><h:commandLink id="cs2" action="#{resultadoBuscadorUserAdmMB.crearUsuario()}" value="Crear usuario"></h:commandLink></li>  
-
+ 
                             <li role="presentation"> <h:commandLink id="cs5" action="#{resultadoBuscadorUserAdmMB.salir()}" value="Cerrar sesión"></h:commandLink> </li>
  
                         </ul>
@@ -71,7 +71,7 @@
                                     <br />
                                     <div align="center">
  
-                                        <p:dataTable var="listaFormulario" value="#" scrollRows="20" scrollable="true" liveScroll="true" style="margin-bottom:0">
+                                        <p:dataTable id="listaUser" var="listaFormulario" value="#" scrollRows="20" scrollable="true" liveScroll="true" style="margin-bottom:0">
  
                                             <p:column headerText="Nombre">
                                                 <h:outputText value="#{resultadoBuscadorUserAdmMB.usuarioBuscado.nombreUsuario}"/>                                                
@@ -86,7 +86,7 @@
                                             </p:column>
  
                                             <p:column headerText="Estado">
-                                                <h:outputText value="#{resultadoBuscadorUserAdmMB.usuarioBuscado.estadoUsuario}"/>                                                
+                                                <h:outputText value="#{resultadoBuscadorUserAdmMB.estadoUsuarioEspanol}" />                                                
                                             </p:column>
  
                                         </p:dataTable>
@@ -94,13 +94,13 @@
                                         <br />
                                         <h4>Modificar Estado</h4><br />                                                                                
  
-                                        <h:commandButton value="Habilitar" label="Habilitar" action = "#{resultadoBuscadorUserAdmMB.habilitarUsuario()}" ></h:commandButton>
+                                        <h:commandButton value="Habilitar" label="Habilitar" action = "#{resultadoBuscadorUserAdmMB.habilitarUsuario()}"  ></h:commandButton>
                                         <p:spacer width="50" height="10" />
                                         <h:commandButton value="Deshabilitar" label="Deshabilitar" action = "#{resultadoBuscadorUserAdmMB.deshabilitarUsuario()}" ></h:commandButton>
                                         
                                     </div>
                                     <br />
-                                    <p:messages id="messages" showDetail="true" autoUpdate="true" closable="true" />
+                                     <p:messages id="messages" showDetail="true" autoUpdate="true" closable="true" />
                                 </h:form>
                             </p:panel>
                         </div>

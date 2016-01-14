@@ -6,6 +6,7 @@
 package facade;
 
 import entity.Formulario;
+import java.sql.Date;
 import java.util.List;
 import javax.ejb.Local;
 
@@ -37,5 +38,5 @@ public interface FormularioFacadeLocal {
     List<Formulario> findByRuc(String ruc);
     
     List<Formulario> findByRit(String rit);
-
+    
 }

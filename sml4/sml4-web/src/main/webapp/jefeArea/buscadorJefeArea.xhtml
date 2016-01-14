@@ -35,7 +35,7 @@
 
                             <li role="presentation"><h:commandLink id="cs2" action="#{buscadorJefeAreaMB.semaforo()}" value="Semáforo"></h:commandLink></li>
 
-                            <!--<li role="presentation"><h:commandLink id="cs3" action="{buscadorJefeAreaMB.estadisticas()}" value="Estadísticas"></h:commandLink></li>-->
+                            <!--   <li role="presentation"><h:commandLink id="cs3" action="{buscadorJefeAreaMB.estadisticas()}" value="Estadísticas"></h:commandLink></li>-->
 
                             <li role="presentation"> <h:commandLink id="cs4" action="#{buscadorJefeAreaMB.salir()}" value="Cerrar sesión"></h:commandLink> </li>
 
@@ -66,30 +66,32 @@
 
 
                     <!-- inicio busqueda -->
-                    <div class="col-md-9">
-                        <div align="center">
-                            <p:messages id="messages" autoUpdate="true" closable="true" showDetail="false"/>
-                            <div class="thumbnail" style="width: 785px; padding: 15px;">
-                                <h4>Inicie la búsqueda de su formulario</h4><br /><br />
-                                <h:form>
+                    <h:form >
+                        <div class="col-md-9">
+                            <div align="center">
+                                <p:messages id="messages" autoUpdate="true" closable="true" showDetail="false"/>
+                                <div class="thumbnail" style="width: 785px; padding: 15px;">
+                                    <h4>Inicie la búsqueda de su formulario</h4><br /><br />
+
                                     <br />
                                     <div align="center">
                                         <h:panelGrid columns="4" cellpadding="5" class="ui-grid">
 
                                             <p:outputLabel for="nue" value="N.U.E.:" style="width:90px"></p:outputLabel>
-                                            <h:inputText id="nue" style="margin-right:10px" value = "#{buscadorJefeAreaMB.nue}" rendered="true" requiredMessage="Debe ingresar el N.U.E.">
+                                            <p:inputText id="nue" type="number" style="margin-right:10px" value = "#{buscadorJefeAreaMB.nue}" rendered="true"  requiredMessage="Debe ingresar el N.U.E.">
 
-                                            </h:inputText>
+                                            </p:inputText>
                                             <h:commandButton value="Buscar" label="nue" action = "#{buscadorJefeAreaMB.buscarFormulario()}" ></h:commandButton>  
 
                                         </h:panelGrid>
                                     </div>
                                     <br />
 
-                                </h:form>
+
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </h:form>
                     <!-- fin de busqueda -->
 
                     <!-- inicio busqueda usuario -->
@@ -105,9 +107,9 @@
                                         <h:panelGrid columns="4" cellpadding="5" class="ui-grid">
 
                                             <p:outputLabel for="rut" value="R.U.T.:" style="width:90px"></p:outputLabel>
-                                            <h:inputText id="rut" style="margin-right:10px" value = "#{buscadorJefeAreaMB.rut}" rendered="true" requiredMessage="Debe ingresar la búsqueda"/>
+                                            <p:inputText id="rut" style="margin-right:10px" value = "#{buscadorJefeAreaMB.rut}" rendered="true" requiredMessage="Debe ingresar la búsqueda"/>
 
-                                            <h:commandButton value="Buscar" label="busca" action = "#{buscadorJefeAreaMB.buscarUsuario()}" ></h:commandButton>  
+                                            <h:commandButton value="Buscar" label="rut" type="number" action = "#{buscadorJefeAreaMB.buscarUsuario()}" ></h:commandButton>  
 
                                         </h:panelGrid>
                                     </div>
@@ -140,7 +142,7 @@
                                         <h:panelGrid columns="4" cellpadding="5" class="ui-grid">
 
                                             <p:outputLabel for="bus" value="Buscar:" style="width:90px"></p:outputLabel>
-                                            <h:inputText id="bus" style="margin-right:10px" value = "#{buscadorJefeAreaMB.input}" rendered="true" requiredMessage="Debe ingresar la búsqueda"/>
+                                            <p:inputText id="bus" style="margin-right:10px" value = "#{buscadorJefeAreaMB.input}" rendered="true" requiredMessage="Debe ingresar la búsqueda"/>
 
                                             <h:commandButton value="Buscar" label="busca" action = "#{buscadorJefeAreaMB.buscarFormularioRRP()}" ></h:commandButton>  
 

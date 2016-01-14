@@ -74,9 +74,6 @@ public class RecibirPeritoMB {
     private List<Traslado> trasladosList;
     private List<EdicionFormulario> edicionesList;
 
-    private List<FormularioEvidencia> evidenciasList;
-
-    private String evidencia;
 
     private int contador = 1;
 
@@ -132,13 +129,6 @@ public class RecibirPeritoMB {
         this.usuarioEntregaRut = userEntrega.getRutUsuario();
 
         this.motivo = "ninguno";
-
-        this.evidenciasList = formularioEJB.findEvidenciaFormularioByFormulario(formulario);
-        if (!evidenciasList.isEmpty()) {
-            this.evidencia = evidenciasList.get(0).getEvidenciaidEvidencia().getNombreEvidencia();
-        }
-        System.out.println("EVIDENCIA! " + evidencia);
-
          intercalado(trasladosList);
         
         logger.exiting(this.getClass().getName(), "cargarDatosPerito");
@@ -225,21 +215,6 @@ public class RecibirPeritoMB {
         this.intercalado = intercalado;
     }
 
-    public List<FormularioEvidencia> getEvidenciasList() {
-        return evidenciasList;
-    }
-
-    public void setEvidenciasList(List<FormularioEvidencia> evidenciasList) {
-        this.evidenciasList = evidenciasList;
-    }
-
-    public String getEvidencia() {
-        return evidencia;
-    }
-
-    public void setEvidencia(String evidencia) {
-        this.evidencia = evidencia;
-    }
 
     public Formulario getFormulario() {
         return formulario;

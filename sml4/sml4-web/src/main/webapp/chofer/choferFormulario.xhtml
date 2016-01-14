@@ -156,34 +156,6 @@
                                     </h:panelGrid>  
                                     <br />  
 
-                                    <!-- evidencia -->
-                                    <h:panelGrid columns="3">
-
-                                        <h:outputLabel for="tipoEvidencia" value="Tipo de evidencia: " />
-                                        <h:selectOneMenu id="tipoEvidencia" value="#{crearFormularioChoferMB.codTipoEvidencia}">
-                                            <f:selectItem itemValue="0" itemLabel="Seleccione" noSelectionOption="true"/>
-                                            <f:selectItem itemValue="1" itemLabel="Biológica (Clínica)"/>
-                                            <f:selectItem itemValue="2" itemLabel="Vestuario (Clínica)"/>
-                                            <f:selectItem itemValue="3" itemLabel="Artefacto (Clínica)"/>
-                                            <f:selectItem itemValue="4" itemLabel="otro (Clínica)"/>
-                                            <f:selectItem itemValue="5" itemLabel="Balística (Tanatología)"/>
-                                            <f:selectItem itemValue="6" itemLabel="Biológica (Tanatología)"/>
-                                            <f:selectItem itemValue="7" itemLabel="Vestuario (Tanatología)"/>
-                                            <f:selectItem itemValue="8" itemLabel="Artefacto (Tanatología)"/>
-                                            <f:selectItem itemValue="9" itemLabel="otro (Tanatología)"/>
-                                            <p:ajax event="change" listener="#{crearFormularioChoferMB.cargarEvidencias(event)}" update="evidencias"/>
-                                        </h:selectOneMenu>
-                                        <br />
-
-                                        <h:outputLabel for="evidencias" value="Evidencias:" />
-                                        <h:selectOneMenu id="evidencias" value="#{crearFormularioChoferMB.evidencias}">    
-                                            <f:selectItem itemValue="0" itemLabel="Seleccione" noSelectionOption="true"/>
-                                            <f:selectItems value="#{crearFormularioChoferMB.listEvidenciasx}" var="evid" itemLabel="#{evid}" itemValue="#{evid}"/>                                           
-                                        </h:selectOneMenu>
-                                        <br />
-                                    </h:panelGrid>
-
-                                    <!-- evidencia -->
 
                                     <h:panelGrid columns="1" cellpadding="5" class="ui-grid">    
 

@@ -2,6 +2,7 @@ package mb.jefeArea;
  
 import ejb.FormularioEJBLocal;
 import ejb.UsuarioEJBLocal;
+import ejb.ValidacionVistasMensajesEJBLocal;
 import entity.Area;
 import entity.Cargo;
 import entity.Usuario;
@@ -26,7 +27,9 @@ import javax.servlet.http.HttpServletRequest;
 @RequestScoped
 @ManagedBean
 public class CrearUsuarioJefeAreaMB {
- 
+
+    @EJB
+    private ValidacionVistasMensajesEJBLocal validacionVistasMensajesEJB; 
     @EJB
     private UsuarioEJBLocal usuarioEJB;
     @EJB
@@ -48,6 +51,7 @@ public class CrearUsuarioJefeAreaMB {
     private String nombreUsuario;
     private String apellidoUsuario;
     private String pass;
+    private String pass2;
     private String mail;
     private String cuentaUsuario;
     private String cargo;
@@ -104,8 +108,106 @@ public class CrearUsuarioJefeAreaMB {
  
         logger.setLevel(Level.ALL);
         logger.entering(this.getClass().getName(), "CrearUsuarioJefeAreaMB");
-        String response = usuarioEJB.crearUsuario(nombreUsuario, apellidoUsuario, rut, pass, mail, cuentaUsuario, cargo, area);
- 
+        
+         boolean datosIncorrectos = false;
+        if (cuentaUsuario == null || cuentaUsuario.equals("")) {            
+            datosIncorrectos = true;
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Debe ingresar Cuenta", ""));
+        } else {
+            String mensaje = validacionVistasMensajesEJB.soloCaracteres(cuentaUsuario);
+            if (!mensaje.equals("Exito")) {
+                datosIncorrectos = true;
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Cuenta: "+mensaje, ""));
+            }
+            mensaje = validacionVistasMensajesEJB.validarCuentaUsuario(cuentaUsuario);
+            if (!mensaje.equals("Exito")) {
+                datosIncorrectos = true;
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,mensaje, ""));
+            }
+        }
+        
+        if (pass == null || pass.equals("")) {
+            datosIncorrectos = true;
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Debe ingresar contraseña de al menos 8 caracteres", ""));
+        } 
+        
+        if (pass2 == null || pass2.equals("")) {
+            datosIncorrectos = true;
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Debe repetir la contraseña", ""));
+        } 
+        
+        if(pass != null && pass2 != null && !pass.equals("") && !pass2.equals("")  && !pass.equals(pass2)){
+            datosIncorrectos = true;
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Contraseñas no coinciden", ""));
+        }
+        
+        if (nombreUsuario == null || nombreUsuario.equals("")) {
+            datosIncorrectos = true;
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Debe ingresar Nombre", ""));
+        } else {
+            String mensaje = validacionVistasMensajesEJB.soloCaracteres(nombreUsuario);
+            if (!mensaje.equals("Exito")) {
+                datosIncorrectos = true;
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Nombre: "+mensaje, ""));
+            }
+        }
+        
+        if (apellidoUsuario == null || apellidoUsuario.equals("")) {
+            datosIncorrectos = true;
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Debe ingresar Apellido", ""));
+        } else {
+            String mensaje = validacionVistasMensajesEJB.soloCaracteres(apellidoUsuario);
+            if (!mensaje.equals("Exito")) {
+                datosIncorrectos = true;
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Apellido: "+mensaje, ""));
+            }
+        }
+        
+        if (rut == null || rut.equals("")) {
+            datosIncorrectos = true;
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Debe ingresar R.U.T.", ""));
+        } else {
+            String mensaje = validacionVistasMensajesEJB.checkRut(rut);
+            if (!mensaje.equals("Exito")) {
+                datosIncorrectos = true;
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "R.U.T.: "+mensaje, ""));
+            }
+            mensaje = validacionVistasMensajesEJB.validarRut(rut);
+            if (!mensaje.equals("Exito")) {
+                datosIncorrectos = true;
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, mensaje, ""));
+            }
+        }
+        
+        if (mail == null || mail.equals("")) {
+            datosIncorrectos = true;
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Debe ingresar Correo", ""));
+        } else {
+            String mensaje = validacionVistasMensajesEJB.validarCorreo(mail);
+            if (!mensaje.equals("Exito")) {
+                datosIncorrectos = true;
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Correo: "+mensaje, ""));
+            }
+        }
+        
+        if (cargo == null || cargo.equals("")) {
+            datosIncorrectos = true;
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Debe ingresar Cargo", ""));
+        }
+        
+        if (area == null || area.equals("")) {
+            datosIncorrectos = true;
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Debe ingresar Área", ""));
+        } 
+        
+        if(datosIncorrectos){
+            httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.usuarioSis);
+            logger.exiting(this.getClass().getName(), "CrearUsuarioJA", "faltan datos");
+            return "";
+        }  
+
+        String response = usuarioEJB.crearUsuario(nombreUsuario, apellidoUsuario, rut, pass, mail, cuentaUsuario, cargo, area);        
+        
         if (response.equals("Exito")) {
             httpServletRequest.getSession().setAttribute("rut", this.rut);
             httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.usuarioSis);
@@ -210,6 +312,14 @@ public class CrearUsuarioJefeAreaMB {
  
     public void setPass(String pass) {
         this.pass = pass;
+    }
+    
+    public String getPass2() {
+        return pass2;
+    }
+ 
+    public void setPass2(String pass2) {
+        this.pass2 = pass;
     }
  
     public String getMail() {

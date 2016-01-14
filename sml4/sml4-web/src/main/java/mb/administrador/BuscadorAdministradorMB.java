@@ -7,6 +7,7 @@ package mb.administrador;
 
 import ejb.FormularioEJBLocal;
 import ejb.UsuarioEJBLocal;
+import ejb.ValidacionVistasMensajesEJBLocal;
 import entity.Usuario;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,6 +30,9 @@ import mb.jefeArea.BuscadorJefeAreaMB;
 @ManagedBean
 public class BuscadorAdministradorMB {
 
+    @EJB
+    private ValidacionVistasMensajesEJBLocal validacionVistasMensajesEJB;
+ 
     @EJB
     private UsuarioEJBLocal usuarioEJB;
     @EJB
@@ -91,19 +95,28 @@ public class BuscadorAdministradorMB {
     public String buscarUsuario() {
 
         logger.setLevel(Level.ALL);
-        logger.entering(this.getClass().getName(), "buscarUsuarioJefeArea");
+        logger.entering(this.getClass().getName(), "buscarUsuario");
         logger.log(Level.INFO, "RUT CAPTURADO:{0}", this.rut);
+
+        if (rut != null && !rut.equals("")) {
+            String mensaje = validacionVistasMensajesEJB.checkRut(rut);
+            if (!mensaje.equals("Exito")) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Debe ingresar R.U.T. válido", " "));
+                return "";
+            }
+        }
+
         Usuario user = usuarioEJB.findUserByRut(rut);
 
         if (user != null) {
             httpServletRequest.getSession().setAttribute("rut", this.rut);
             httpServletRequest1.getSession().setAttribute("cuentaUsuario", this.usuarioSis);
-            logger.exiting(this.getClass().getName(), "buscarUsuarioJefeArea", "buscadorJefeAreaResultUsuario");
-            return "buscadorJefeAreaResultUsuario.xhtml?faces-redirect=true";
+            logger.exiting(this.getClass().getName(), "buscarUsuario", "buscadorJefeAreaResultUsuario");
+            return "buscadorAdmResultUsuario.xhtml?faces-redirect=true";
         }
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "no existe", "Datos no válidos"));
-        logger.info("formulario no encontrado");
-        logger.exiting(this.getClass().getName(), "buscarUsuarioJefeArea", "buscarUsuario");
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "R.U.T. no encontrado", ""));
+
+        logger.exiting(this.getClass().getName(), "buscarUsuario", "buscarUsuario");
         return "";
 
     }

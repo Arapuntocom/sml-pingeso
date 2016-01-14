@@ -7,6 +7,7 @@ package facade;
 
 import entity.Formulario;
 import entity.FormularioEvidencia;
+import entity.TipoEvidencia;
 import static facade.AbstractFacade.logger;
 import java.util.List;
 import java.util.logging.Level;
@@ -51,7 +52,7 @@ public class FormularioEvidenciaFacade extends AbstractFacade<FormularioEvidenci
         try {
             Query q = em.createNamedQuery("FormularioEvidencia.findByFormulario", FormularioEvidencia.class).setParameter("formularioNUE", formulario);
             retorno =  q.getResultList();
-            logger.log(Level.INFO, "buscar formulario-evidencia by numero de parte -> {0}", formulario);
+            logger.log(Level.INFO, "buscar formulario-evidencia by formulario-> {0}", formulario);
         } catch (IllegalArgumentException e) {
             logger.severe("FormularioEvidenciaFacade: el nombre o el parametro de la Query no existe -> " + e);
             retorno = null;
@@ -85,6 +86,53 @@ public class FormularioEvidenciaFacade extends AbstractFacade<FormularioEvidenci
             return null;
         } else {
             logger.exiting(this.getClass().getName(), "findByFormulario", retorno.toString());
+            return retorno;
+        }
+    }
+    
+    
+    @Override
+    public List<FormularioEvidencia> findByTE(TipoEvidencia te) {
+        logger.setLevel(Level.ALL);
+        logger.entering(this.getClass().getName(), "findByTE", te);
+        List<FormularioEvidencia> retorno = null;
+        try {
+            Query q = em.createNamedQuery("FormularioEvidencia.findByIdFormularioEvidencia", FormularioEvidencia.class).setParameter("idFormularioEvidencia", te);
+            retorno =  q.getResultList();
+            logger.log(Level.INFO, "buscar formulario-evidencia by tipo de evidencia -> {0}", te);
+        } catch (IllegalArgumentException e) {
+            logger.severe("FormularioEvidenciaFacade: el nombre o el parametro de la Query no existe -> " + e);
+            retorno = null;
+        } catch (NoResultException e) {
+            logger.severe("FormularioEvidenciaFacade: No hay resultados -> " + e);
+            retorno = null;
+        } catch (NonUniqueResultException e) {
+            logger.severe("FormularioEvidenciaFacade: hay mas de un resulado -> " + e);
+            retorno = null;
+        } catch (IllegalStateException e) {
+            logger.severe("FormularioEvidenciaFacade: ocurrio un problema con la consulta -> " + e);
+            retorno = null;
+        } catch (QueryTimeoutException e) {
+            logger.severe("FormularioEvidenciaFacade: ocurrio un problema con la consulta -> " + e);
+            retorno = null;
+        } catch (TransactionRequiredException e) {
+            logger.severe("FormularioEvidenciaFacade: ocurrio un problema con la consulta -> " + e);
+            retorno = null;
+        } catch (PessimisticLockException e) {
+            logger.severe("FormularioEvidenciaFacade: ocurrio un problema con la consulta -> " + e);
+            retorno = null;
+        } catch (LockTimeoutException e) {
+            logger.severe("FormularioEvidenciaFacade: ocurrio un problema con la consulta -> " + e);
+            retorno = null;
+        } catch (PersistenceException e) {
+            logger.severe("FormularioEvidenciaFacade: ocurrio un problema con la consulta -> " + e);
+            retorno = null;
+        }
+        if (retorno == null) {
+            logger.exiting(this.getClass().getName(), "findByTE", null);
+            return null;
+        } else {
+            logger.exiting(this.getClass().getName(), "findByTE", retorno.toString());
             return retorno;
         }
     }

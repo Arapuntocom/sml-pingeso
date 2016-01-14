@@ -129,8 +129,7 @@
                                     <h:outputLabel  for="obs" value="Observaciones:" style="width:120px"></h:outputLabel>
                                     <p:inputTextarea id="Observaciones" rows="3" cols="90" value="#{recibirPeritoMB.formulario.observaciones}" queryDelay="750" minQueryLength="4" disabled="true" />
 
-                                    <h:outputLabel for="evi" value="Evidencia:" style="width:120px"/>
-                                    <p:inputText id="evi" value="#{recibirPeritoMB.evidencia}" label="Evidencia" disabled="true"></p:inputText>    
+                               
                                     
                                     <h:outputLabel  for="des" value="Descripción:" style="width:120px"></h:outputLabel>
                                     <p:inputTextarea id="descripcion" rows="3" cols="90" value="#{recibirPeritoMB.formulario.descripcionEspecieFormulario}" disabled="true" queryDelay="750" minQueryLength="4" />
@@ -202,7 +201,7 @@
                                 <h:outputLabel  for="obsCC" value="Observaciones:" style="width:120px"></h:outputLabel>
                                 <p:inputTextarea id="ObsCC" rows="3" cols="90" value="#{recibirPeritoMB.observacionesT}" queryDelay="750" minQueryLength="4" />
                                 <br />    
-                                <p:commandButton id="btnAceptar" value="Aceptar" action="#{recibirPeritoMB.agregarTraslado()}"/>
+                                <p:commandButton id="btnAceptar" value="Aceptar" actionListener="#{recibirPeritoMB.agregarTraslado()}"/>
                                 <p:messages id="messages" closable="true" />
                                 <br />
 

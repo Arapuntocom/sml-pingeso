@@ -31,6 +31,8 @@ public interface EvidenciaFacadeLocal {
 
     int count();
 
-    public Evidencia findByNombreAndTipoEvidencia(String evidencia, TipoEvidencia tipoEvid);
-    
+     Evidencia findByNombreAndTipoEvidencia(String evidencia, TipoEvidencia tipoEvid);
+
+     List<Evidencia> evidenciasT(TipoEvidencia tipoEvid);
+
 }

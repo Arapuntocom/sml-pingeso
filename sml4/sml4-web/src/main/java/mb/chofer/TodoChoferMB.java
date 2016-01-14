@@ -55,7 +55,6 @@ public class TodoChoferMB {
     private List<Traslado> trasladosList;
     private List<EdicionFormulario> edicionesList;
 
-    private List<FormularioEvidencia> evidenciasList;
 
     private boolean bloqueada;
     private boolean editable;
@@ -75,7 +74,7 @@ public class TodoChoferMB {
         logger.entering(this.getClass().getName(), "TodoChoferMB");
         this.trasladosList = new ArrayList<>();
         this.edicionesList = new ArrayList<>();
-        this.evidenciasList = new ArrayList<>();
+
         this.intercalado = new ArrayList<>();
         facesContext = FacesContext.getCurrentInstance();
         httpServletRequest = (HttpServletRequest) facesContext.getExternalContext().getRequest();
@@ -102,12 +101,6 @@ public class TodoChoferMB {
         this.trasladosList = formularioEJB.traslados(this.formulario);
 
         this.edicionesList = formularioEJB.listaEdiciones(nue);
-
-        this.evidenciasList = formularioEJB.findEvidenciaFormularioByFormulario(formulario);
-        if (!evidenciasList.isEmpty()) {
-            this.evidencia = evidenciasList.get(0).getEvidenciaidEvidencia().getNombreEvidencia();
-        }
-        System.out.println("EVIDENCIA! " + evidencia);
 
         this.bloqueada = formulario.getBloqueado();
         this.editable = formularioEJB.esParticipanteCC(formulario, usuarioSesion);
@@ -274,13 +267,6 @@ public class TodoChoferMB {
         this.editable = editable;
     }
 
-    public List<FormularioEvidencia> getEvidenciasList() {
-        return evidenciasList;
-    }
-
-    public void setEvidenciasList(List<FormularioEvidencia> evidenciasList) {
-        this.evidenciasList = evidenciasList;
-    }
 
     public String getEvidencia() {
         return evidencia;
